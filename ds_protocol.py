@@ -59,3 +59,14 @@ def bio_post(bio, token):
     return json_string
 
 
+def send_dm(username, message, token):
+    username = '"' + username + '"'
+    message = '"' + message + '"'
+    token = '"' + token + '"'
+    json_string = '{"token":{token}, "directmessage": {"entry": {message}, "recipient": {username}, "timestamp": "1603167689.3928561"}}'
+    json_string = json_string.replace('{username}', username)
+    json_string = json_string.replace('{message}', message)
+    json_string = json_string.replace('{token}', token)
+
+    return json_string
+
