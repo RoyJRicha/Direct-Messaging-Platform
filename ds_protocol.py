@@ -70,3 +70,18 @@ def send_dm(username, message, token):
 
     return json_string
 
+
+def unread_dms(token):
+    token = '"' + token + '"'
+    json_string = '{"token":{token}, "directmessage": "new"}'
+    json_string = json_string.replace('{token}', token)
+
+    return json_string
+
+
+def all_dms(message, token):
+    token = '"' + token + '"'
+    json_string = '{"token":{token}, "directmessage": "all"}'
+    json_string = json_string.replace('{token}', token)
+
+    return json_string
