@@ -79,7 +79,7 @@ def unread_dms(token):
     return json_string
 
 
-def all_dms(message, token):
+def all_dms(token):
     token = '"' + token + '"'
     json_string = '{"token":{token}, "directmessage": "all"}'
     json_string = json_string.replace('{token}', token)
