@@ -16,12 +16,12 @@ class DirectMessenger:
     def __init__(self, dsuserver=None, username=None, password=None):
         self.token = None
         self.username = username
-        self.passowrd = password
+        self.password = password
         self.dsuserver = dsuserver
-        self.port = 3024
+        self.port = 3021
 
     
-    def token(self):
+    def retrieve_token(self):
 
         results = True
         c_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -100,19 +100,16 @@ class DirectMessenger:
             if user_extraction.response['type'] == 'ok':
                 self.token = user_extraction.token
 
-        return results
+        return results, c_socket
 		
 
     def send(self, message:str, recipient:str) -> bool:
         # must return true if message successfully sent, false if send failed.
-        results = token()
-        c_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        results, c_socket = self.retrieve_token()
 
         # Accessing the username and password
         if results is True:
             try:
-                c_socket.connect((self.dsuserver, self.port))
-
                 data = dp.send_dm(recipient, message, self.token)
 
                 try:
@@ -128,14 +125,6 @@ class DirectMessenger:
                 except:
                     print('Could not access/send message and recipient or connect to the server.\n')
                     results = False
-            # Checks for a failed connection
-            except ConnectionRefusedError:
-                print('\nUnable to connect to the server. Invalid IP Address or Port Number. Please try again!\n')
-                results = False
-            # Checks for an invalid Port number which causes a TimeoutError
-            except TimeoutError:
-                print('\nA connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond\n')
-                results = False
             # Checks in case the hard coded function call has incorrect types passed in
             except TypeError:
                 print('\nFailed to connect to the server likely due to the following error(s): \n')
@@ -149,24 +138,97 @@ class DirectMessenger:
                     print('\tMessage must be given as a string, not an integer, float, None, or boolean.\n')
 
                 results = False
-            # This ensures that the IP address given is valid
-            except socket.gaierror:
-                print('\nUnable to connect to the server. Invalid IP Address. Please try again!\n')
-                results = False
-            # This is used to catch an extra errors that may occur
-            except:
-                # print('Unable to connect to the server. Invalid IP Address or Port Number. Please try again!\n')
-                traceback.print_exc()
-                print('\nAn Error has occured, please try again!\n')
-                results = False
+
+        c_socket.close()
 
         return results
 
 
     def retrieve_new(self) -> list:
         # must return a list of DirectMessage objects containing all new messages
-        pass
+        results, c_socket = self.retrieve_token()
+
+        if results is True:
+            try:
+                data = dp.unread_dms(self.token)
+
+                try:
+                    c_socket.sendall(data.encode())
+                    received_data = c_socket.recv(4096).decode()
+                    received_data_dict = json.loads(received_data)
+                    print()
+                    print(received_data_dict)
+                    print(received_data_dict['response']['messages'])
+                    dms_dict = received_data_dict['response']['messages']
+                    new_dms = []
+                    print()
+                    if received_data_dict['response']['type'] == 'error':
+                        results = False
+                # This will return a statement if program wasn't able to access user or pass
+                except Exception as e:
+                    print('Could not access/send message and recipient or connect to the server:', e)
+                    results = False
+
+            except Exception as e:
+                print("An error occurred:", e)
+                results = False
+            
+        if results is True:
+            for element in dms_dict:
+                message_class = DirectMessage()
+                message_class.message = element['message']
+                message_class.recipient = element['from']
+                message_class.timestamp = element['timestamp']
+
+                new_dms.append(message_class)
+
+        
+        if results is False:
+            return results
+        else:
+            return new_dms
+            
 
     def retrieve_all(self) -> list:
         # must return a list of DirectMessage objects containing all messages
-        pass
+        results, c_socket = self.retrieve_token()
+
+        if results is True:
+            try:
+                data = dp.all_dms(self.token)
+
+                try:
+                    c_socket.sendall(data.encode())
+                    received_data = c_socket.recv(4096).decode()
+                    received_data_dict = json.loads(received_data)
+                    print()
+                    print(received_data_dict)
+                    print(received_data_dict['response']['messages'])
+                    dms_dict = received_data_dict['response']['messages']
+                    new_dms = []
+                    print()
+                    if received_data_dict['response']['type'] == 'error':
+                        results = False
+                # This will return a statement if program wasn't able to access user or pass
+                except Exception as e:
+                    print('Could not access/send message and recipient or connect to the server:', e)
+                    results = False
+
+            except Exception as e:
+                print("An error occurred:", e)
+                results = False
+            
+        if results is True:
+            for element in dms_dict:
+                message_class = DirectMessage()
+                message_class.message = element['message']
+                message_class.recipient = element['from']
+                message_class.timestamp = element['timestamp']
+
+                new_dms.append(message_class)
+
+        
+        if results is False:
+            return results
+        else:
+            return new_dms
