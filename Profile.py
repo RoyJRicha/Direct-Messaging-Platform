@@ -270,6 +270,11 @@ class Profile:
                 for post_obj in obj['_posts']:
                     post = Post(post_obj['entry'], post_obj['timestamp'])
                     self._posts.append(post)
+                for msg_obj in obj['_messages']:
+                    msg = Message(msg_obj['message'], msg_obj['author'], msg_obj['timestamp'])
+                    self._messages.append(msg)
+                for friend_obj in obj['friends']:
+                    self.friends.append(friend_obj)
                 f.close()
             except Exception as ex:
                 raise DsuProfileError(ex)

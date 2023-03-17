@@ -3,8 +3,10 @@ import Profile as Pr
 
 
 dming = dm.DirectMessenger("168.235.86.101", "RizzyWeather", "weatherpass")
-data = dming.retrieve_all()
+data = dming.send("don't hide your overwatch profile", "crykor")
 
+'''
+data = dming.retrieve_new()
 
 profile = Pr.Profile()
 profile.load_profile("C:\\Users\\rrich\\PythonFiles\\Assignments\\Test Files\\WeatherJournal.dsu")
@@ -15,3 +17,4 @@ for i in data:
     profile.add_message(new_message)
 
 profile.save_profile("C:\\Users\\rrich\\PythonFiles\\Assignments\\Test Files\\WeatherJournal.dsu")
+'''

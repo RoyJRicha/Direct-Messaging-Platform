@@ -118,7 +118,6 @@ class DirectMessenger:
                     received_data = c_socket.recv(4096).decode()
                     received_data_dict = json.loads(received_data)
                     print()
-                    print(received_data_dict)
                     print(received_data_dict['response']['messages'])
                     dms_dict = received_data_dict['response']['messages']
                     new_dms = []
@@ -196,7 +195,6 @@ class DirectMessenger:
         result = self.retrieve_dms("new")
 
         print(result)
-        c_socket.close()
 
         return result
 
@@ -206,6 +204,5 @@ class DirectMessenger:
         result = self.retrieve_dms("all")
 
         print(result)
-        c_socket.close()
 
         return result

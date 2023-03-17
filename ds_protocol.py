@@ -59,7 +59,7 @@ def bio_post(bio, token):
     return json_string
 
 
-def send_dm(username, message, token):
+def send_dm(message, username, token):
     username = '"' + username + '"'
     message = '"' + message + '"'
     token = '"' + token + '"'
