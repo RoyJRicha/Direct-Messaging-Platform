@@ -4,6 +4,7 @@ from typing import Text
 import os
 import platform
 import subprocess
+import Profile as Profile
 
 
 class Body(tk.Frame):
@@ -254,7 +255,7 @@ class MainApp(tk.Frame):
         username_entry.grid(row=0, column=1)
 
         tk.Label(self.biomentrics_window, text="Password").grid(row=1, column=0)
-        password_entry = tk.Entry(self.biomentrics_window, show="*")
+        password_entry = tk.Entry(self.biomentrics_window)
         password_entry.grid(row=1, column=1)
 
         tk.Label(self.biomentrics_window, text="Bio").grid(row=2, column=0)
@@ -268,17 +269,27 @@ class MainApp(tk.Frame):
         tk.Button(self.biomentrics_window, text="Save", command=self.biomentrics_saver).grid(row=4, column=0, columnspan=2)
 
         # Save the Entry widgets as instance variables so you can access their values later
-        self.username_entry = username_entry
-        self.password_entry = password_entry
-        self.bio_entry = bio_entry
-        self.ip_entry = ip_entry
+        self.new_username_entry = username_entry
+        self.new_password_entry = password_entry
+        self.new_bio_entry = bio_entry
+        self.new_ip_entry = ip_entry
+
 
     def biomentrics_saver(self):
         # Get the values from the Entry widgets
-        username = self.username_entry.get()
-        password = self.password_entry.get()
-        bio = self.bio_entry.get()
-        ip_address = self.ip_entry.get()
+        new_username = self.new_username_entry.get()
+        new_password = self.new_password_entry.get()
+        new_bio = self.new_bio_entry.get()
+        new_ip_address = self.new_ip_entry.get()
+
+        profile = Profile.Profile()
+        # profile.load_profile(self.new_file_path)
+        profile.save_profile(self.new_file_path)
+        profile.username = new_username
+        profile.password = new_password
+        profile.bio = new_bio
+        profile.dsuserver = new_ip_address
+        profile.save_profile(self.new_file_path)
 
         # Close the user info window
         self.biomentrics_window.destroy()
