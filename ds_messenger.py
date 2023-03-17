@@ -196,6 +196,7 @@ class DirectMessenger:
         result = self.retrieve_dms("new")
 
         print(result)
+        c_socket.close()
 
         return result
 
@@ -204,6 +205,7 @@ class DirectMessenger:
         # must return a list of DirectMessage objects containing all messages
         result = self.retrieve_dms("all")
 
-        print(result[0])
+        print(result)
+        c_socket.close()
 
         return result
