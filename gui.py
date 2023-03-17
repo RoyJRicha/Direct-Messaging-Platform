@@ -231,11 +231,58 @@ class MainApp(tk.Frame):
         if file_path:
             # Create the new file
             open(file_path, 'a').close()
+            # Saves the file path as a variable for Profile.py to use
+            self.new_file_path = file_path
+            print(self.new_file_path)
+            '''
             # Open the new file in the default text editor
             if self.my_os == 'Windows':
                 os.startfile(file_path)
             else:
                 subprocess.call(('open', file_path))
+            '''
+            # Calls the function to open a new window to save profile info
+            self.biometrics_window()
+
+    def biometrics_window(self):
+        # Create a new window to prompt for user info
+        self.biomentrics_window = tk.Toplevel(self.root)
+
+        # Add Labels, Entries, and Buttons to the new window
+        tk.Label(self.biomentrics_window, text="Username").grid(row=0, column=0)
+        username_entry = tk.Entry(self.biomentrics_window)
+        username_entry.grid(row=0, column=1)
+
+        tk.Label(self.biomentrics_window, text="Password").grid(row=1, column=0)
+        password_entry = tk.Entry(self.biomentrics_window, show="*")
+        password_entry.grid(row=1, column=1)
+
+        tk.Label(self.biomentrics_window, text="Bio").grid(row=2, column=0)
+        bio_entry = tk.Entry(self.biomentrics_window)
+        bio_entry.grid(row=2, column=1)
+
+        tk.Label(self.biomentrics_window, text="IP Address").grid(row=3, column=0)
+        ip_entry = tk.Entry(self.biomentrics_window)
+        ip_entry.grid(row=3, column=1)
+
+        tk.Button(self.biomentrics_window, text="Save", command=self.biomentrics_saver).grid(row=4, column=0, columnspan=2)
+
+        # Save the Entry widgets as instance variables so you can access their values later
+        self.username_entry = username_entry
+        self.password_entry = password_entry
+        self.bio_entry = bio_entry
+        self.ip_entry = ip_entry
+
+    def biomentrics_saver(self):
+        # Get the values from the Entry widgets
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        bio = self.bio_entry.get()
+        ip_address = self.ip_entry.get()
+
+        # Close the user info window
+        self.biomentrics_window.destroy()
+
 
 if __name__ == "__main__":
     # All Tkinter programs start with a root window. We will name ours 'main'.
