@@ -156,7 +156,7 @@ class Profile:
         self.bio = ''            # OPTIONAL
         self._posts = []         # OPTIONAL
         self._messages = []
-        self.authors = []
+        self.friends = []
 
 
     def add_post(self, post: Post) -> None:
@@ -180,12 +180,12 @@ class Profile:
         self._messages.append(message)
 
     
-    def add_author(self, author):
+    def add_author(self, friend):
         """
         Adds authors from messages
         """
-        if author not in self.authors:
-            self.authors.append(author)
+        if friend not in self.friends:
+            self.friends.append(friend)
         else:
             pass
 

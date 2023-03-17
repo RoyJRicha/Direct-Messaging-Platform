@@ -5,6 +5,7 @@ import Profile as Pr
 dming = dm.DirectMessenger("168.235.86.101", "RizzyWeather", "weatherpass")
 data = dming.retrieve_all()
 
+
 profile = Pr.Profile()
 profile.load_profile("C:\\Users\\rrich\\PythonFiles\\Assignments\\Test Files\\WeatherJournal.dsu")
 profile.save_profile("C:\\Users\\rrich\\PythonFiles\\Assignments\\Test Files\\WeatherJournal.dsu")
