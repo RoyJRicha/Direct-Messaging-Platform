@@ -247,26 +247,34 @@ class MainApp(tk.Frame):
 
     def biometrics_window(self):
         # Create a new window to prompt for user info
-        self.biomentrics_window = tk.Toplevel(self.root)
+        self.profile_window = tk.Toplevel(self.root)
+        self.profile_window.title("Create Profile")
 
-        # Add Labels, Entries, and Buttons to the new window
-        tk.Label(self.biomentrics_window, text="Username").grid(row=0, column=0)
-        username_entry = tk.Entry(self.biomentrics_window)
-        username_entry.grid(row=0, column=1)
+        # Set color of new window
+        self.profile_window.configure(background="#4285f4")
 
-        tk.Label(self.biomentrics_window, text="Password").grid(row=1, column=0)
-        password_entry = tk.Entry(self.biomentrics_window)
-        password_entry.grid(row=1, column=1)
+        # Add Titles, Labels, Entries, and Buttons to the new window
+        title = tk.Label(self.profile_window, text="Create Your Profile", font=("Impact", 16))
+        #title.place(relx=0.5, rely=0.0, anchor="center")
+        title.grid(row=0, column=1)
 
-        tk.Label(self.biomentrics_window, text="Bio").grid(row=2, column=0)
-        bio_entry = tk.Entry(self.biomentrics_window)
-        bio_entry.grid(row=2, column=1)
+        tk.Label(self.profile_window, text="Username", font=("Verdana", 10)).grid(row=2, column=0)
+        username_entry = tk.Entry(self.profile_window)
+        username_entry.grid(row=2, column=1)
 
-        tk.Label(self.biomentrics_window, text="IP Address").grid(row=3, column=0)
-        ip_entry = tk.Entry(self.biomentrics_window)
-        ip_entry.grid(row=3, column=1)
+        tk.Label(self.profile_window, text="Password", font=("Verdana", 10)).grid(row=4, column=0)
+        password_entry = tk.Entry(self.profile_window, show="*")
+        password_entry.grid(row=4, column=1)
 
-        tk.Button(self.biomentrics_window, text="Save", command=self.biomentrics_saver).grid(row=4, column=0, columnspan=2)
+        tk.Label(self.profile_window, text="Bio", font=("Verdana", 10)).grid(row=6, column=0)
+        bio_entry = tk.Entry(self.profile_window)
+        bio_entry.grid(row=6, column=1)
+
+        tk.Label(self.profile_window, text="IP Address", font=("Verdana", 10)).grid(row=8, column=0)
+        ip_entry = tk.Entry(self.profile_window)
+        ip_entry.grid(row=8, column=1)
+
+        tk.Button(self.profile_window, text="Save", command=self.biomentrics_saver).grid(row=10, column=0, columnspan=2)
 
         # Save the Entry widgets as instance variables so you can access their values later
         self.new_username_entry = username_entry
@@ -292,7 +300,7 @@ class MainApp(tk.Frame):
         profile.save_profile(self.new_file_path)
 
         # Close the user info window
-        self.biomentrics_window.destroy()
+        self.profile_window.destroy()
 
 
 if __name__ == "__main__":
