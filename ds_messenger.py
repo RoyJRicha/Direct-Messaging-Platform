@@ -101,7 +101,54 @@ class DirectMessenger:
                 self.token = user_extraction.token
 
         return results, c_socket
-		
+
+
+    def retrieve_dms(self, category):
+        results, c_socket = self.retrieve_token()
+
+        if results is True:
+            try:
+                if category == "new":
+                    data = dp.unread_dms(self.token)
+                elif category == "all":
+                    data = dp.all_dms(self.token)
+
+                try:
+                    c_socket.sendall(data.encode())
+                    received_data = c_socket.recv(4096).decode()
+                    received_data_dict = json.loads(received_data)
+                    print()
+                    print(received_data_dict)
+                    print(received_data_dict['response']['messages'])
+                    dms_dict = received_data_dict['response']['messages']
+                    new_dms = []
+                    print()
+                    if received_data_dict['response']['type'] == 'error':
+                        results = False
+                # This will return a statement if program wasn't able to access user or pass
+                except Exception as e:
+                    print('Could not access/send message and recipient or connect to the server:', e)
+                    results = False
+
+            except Exception as e:
+                print("An error occurred:", e)
+                results = False
+            
+        if results is True:
+            for element in dms_dict:
+                message_class = DirectMessage()
+                message_class.message = element['message']
+                message_class.recipient = element['from']
+                message_class.timestamp = element['timestamp']
+
+                new_dms.append(message_class)
+
+        
+        if results is False:
+            return results
+        else:
+            return new_dms
+
 
     def send(self, message:str, recipient:str) -> bool:
         # must return true if message successfully sent, false if send failed.
@@ -110,7 +157,7 @@ class DirectMessenger:
         # Accessing the username and password
         if results is True:
             try:
-                data = dp.send_dm(recipient, message, self.token)
+                data = dp.send_dm(message, recipient, self.token)
 
                 try:
                     c_socket.sendall(data.encode())
@@ -146,89 +193,17 @@ class DirectMessenger:
 
     def retrieve_new(self) -> list:
         # must return a list of DirectMessage objects containing all new messages
-        results, c_socket = self.retrieve_token()
+        result = self.retrieve_dms("new")
 
-        if results is True:
-            try:
-                data = dp.unread_dms(self.token)
+        print(result)
 
-                try:
-                    c_socket.sendall(data.encode())
-                    received_data = c_socket.recv(4096).decode()
-                    received_data_dict = json.loads(received_data)
-                    print()
-                    print(received_data_dict)
-                    print(received_data_dict['response']['messages'])
-                    dms_dict = received_data_dict['response']['messages']
-                    new_dms = []
-                    print()
-                    if received_data_dict['response']['type'] == 'error':
-                        results = False
-                # This will return a statement if program wasn't able to access user or pass
-                except Exception as e:
-                    print('Could not access/send message and recipient or connect to the server:', e)
-                    results = False
+        return result
 
-            except Exception as e:
-                print("An error occurred:", e)
-                results = False
-            
-        if results is True:
-            for element in dms_dict:
-                message_class = DirectMessage()
-                message_class.message = element['message']
-                message_class.recipient = element['from']
-                message_class.timestamp = element['timestamp']
-
-                new_dms.append(message_class)
-
-        
-        if results is False:
-            return results
-        else:
-            return new_dms
-            
 
     def retrieve_all(self) -> list:
         # must return a list of DirectMessage objects containing all messages
-        results, c_socket = self.retrieve_token()
+        result = self.retrieve_dms("all")
 
-        if results is True:
-            try:
-                data = dp.all_dms(self.token)
+        print(result[0])
 
-                try:
-                    c_socket.sendall(data.encode())
-                    received_data = c_socket.recv(4096).decode()
-                    received_data_dict = json.loads(received_data)
-                    print()
-                    print(received_data_dict)
-                    print(received_data_dict['response']['messages'])
-                    dms_dict = received_data_dict['response']['messages']
-                    new_dms = []
-                    print()
-                    if received_data_dict['response']['type'] == 'error':
-                        results = False
-                # This will return a statement if program wasn't able to access user or pass
-                except Exception as e:
-                    print('Could not access/send message and recipient or connect to the server:', e)
-                    results = False
-
-            except Exception as e:
-                print("An error occurred:", e)
-                results = False
-            
-        if results is True:
-            for element in dms_dict:
-                message_class = DirectMessage()
-                message_class.message = element['message']
-                message_class.recipient = element['from']
-                message_class.timestamp = element['timestamp']
-
-                new_dms.append(message_class)
-
-        
-        if results is False:
-            return results
-        else:
-            return new_dms
+        return result

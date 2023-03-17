@@ -85,3 +85,65 @@ def all_dms(token):
     json_string = json_string.replace('{token}', token)
 
     return json_string
+
+
+
+class Post(dict):
+    """
+
+    Post class is responsible for working with individual user posts. It
+    supports two features: Timestamp property that is set on instantiation/
+    when entry object is set and an entry property that stores post message.
+
+    """
+    def __init__(self, entry: str = None, timestamp: float = 0):
+        '''
+        variable instantiation
+        '''
+        self._timestamp = timestamp
+        self.set_entry(entry)
+
+        # Subclass dict to expose Post properties for serialization
+        # Don't worry about this!
+        dict.__init__(self, entry=self._entry, timestamp=self._timestamp)
+
+    def set_entry(self, entry):
+        '''
+        Sets the entry
+        '''
+        self._entry = entry
+        dict.__setitem__(self, 'entry', entry)
+
+        # If timestamp has not been set, generate a new from time module
+        if self._timestamp == 0:
+            self._timestamp = time.time()
+
+    def get_entry(self):
+        '''
+        gets the entry
+        '''
+        return self._entry
+
+    def set_time(self, time: float):
+        '''
+        sets the time
+        '''
+        self._timestamp = time
+        dict.__setitem__(self, 'timestamp', time)
+
+    def get_time(self):
+        '''
+        gets the time
+        '''
+        return self._timestamp
+
+    """
+
+    The property method is used to support get and set capability for entry and
+    time values. When value for entry is changed, or set, timestamp field is
+    updated to the current time.
+
+    """
+    entry = property(get_entry, set_entry)
+    timestamp = property(get_time, set_time)
+

@@ -94,6 +94,43 @@ class Post(dict):
     timestamp = property(get_time, set_time)
 
 
+class Message(dict):
+    """
+    Message class is responsible for working with individual user messages. It
+    supports three features: Timestamp property that is set on instantiation/
+    when entry object is set and an entry property that stores post message,
+    and the user who sent the message.
+    """
+
+    def __init__(self, message: str = None, author: str = None, timestamp: float = 0):
+        '''
+        Variable instantiation
+        '''
+        self._timestamp = timestamp
+        self.add_message(message)
+        self.add_author(author)
+
+        # Subclass dict to expose Post properties for serialization
+        # Don't worry about this!
+        dict.__init__(self, message=self._message, author=self._author, timestamp=self._timestamp)
+
+
+    def add_message(self, message):
+        '''
+        Sets the message
+        '''
+        self._message = message
+        dict.__setitem__(self, 'message', message)
+
+
+    def add_author(self, author):
+        '''
+        Sets the message
+        '''
+        self._author = author
+        dict.__setitem__(self, 'author', author)
+
+
 class Profile:
     """
     Profile class exposes properties required to join an ICS 32 DSU server. You
@@ -118,6 +155,8 @@ class Profile:
         self.password = password  # REQUIRED
         self.bio = ''            # OPTIONAL
         self._posts = []         # OPTIONAL
+        self._messages = []
+        self.authors = []
 
 
     def add_post(self, post: Post) -> None:
@@ -132,6 +171,23 @@ class Profile:
         """
         self._posts.append(post)
 
+
+    def add_message(self, message):
+        """
+        Adds messages recieved from
+        users
+        """
+        self._messages.append(message)
+
+    
+    def add_author(self, author):
+        """
+        Adds authors from messages
+        """
+        if author not in self.authors:
+            self.authors.append(author)
+        else:
+            pass
 
     def del_post(self, index: int) -> bool:
         """
