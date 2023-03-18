@@ -57,9 +57,9 @@ class DirectMessenger:
         # Checks in case the hard coded function call has incorrect types passed in
         except TypeError:
             print('\nFailed to connect to the server likely due to the following error(s): \n')
-            if type(server) != str:
+            if type(self.dsuserver) != str:
                 print('\tThe server IP Address must be given as a string, bytes or bytearray expected, not an integer, float, None, or boolean\n')
-            if type(port) != int:
+            if type(self.port) != int:
                 print('\tPort number must be given as an integer, not a string, float, None, or boolean\n')
             if type(username) != str:
                 print('\tUsername must be given as a string, not an integer, float, None, or boolean\n')
@@ -174,9 +174,9 @@ class DirectMessenger:
             # Checks in case the hard coded function call has incorrect types passed in
             except TypeError:
                 print('\nFailed to connect to the server likely due to the following error(s): \n')
-                if type(server) != str:
+                if type(self.dsuserver) != str:
                     print('\tThe server IP Address must be given as a string, bytes or bytearray expected, not an integer, float, None, or boolean\n')
-                if type(port) != int:
+                if type(self.port) != int:
                     print('\tPort number must be given as an integer, not a string, float, None, or boolean\n')
                 if type(recipient) != str:
                     print('\tRecipient must be given as a string, not an integer, float, None, or boolean\n')

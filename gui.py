@@ -24,6 +24,11 @@ class Body(tk.Frame):
         if self._select_callback is not None:
             self._select_callback(entry)
 
+
+    def reset_tree(self):
+        self.posts_tree.delete(*self.posts_tree.get_children())
+
+
     def insert_contact(self, contact: str):
         self._contacts.append(contact)
         id = len(self._contacts) - 1
@@ -150,6 +155,7 @@ class MainApp(tk.Frame):
         self.password = None
         self.server = None
         self.recipient = None
+        self.new_file_path = None
         self.my_os = platform.system()
         # You must implement this! You must configure and
         # instantiate your DirectMessenger instance after this line.
@@ -159,7 +165,27 @@ class MainApp(tk.Frame):
         # call the _draw method to pack the widgets
         # into the root frame
         self._draw()
-        self.body.insert_contact("studentexw23") # adding one example student.
+
+
+    def list_contacts(self):
+        self.body.reset_tree()
+        if self.new_file_path:
+            profile = Profile.Profile()
+            profile.load_profile(self.new_file_path)
+            # print(profile._messages)
+            # friends_lst = Profile.Profile.get_friends(self.profile)
+            # print(friends_lst)
+            contacts = profile.friends
+            for contact in contacts:
+                self.body.insert_contact(contact)
+
+    def list_contact_messages(self, recipient):
+        profile = Profile.Profile()
+        profile.load_profile(self.new_file_path)
+        messages = profile._messages
+        for entry in reversed(messages):
+            if recipient == entry['author']:
+                self.body.insert_contact_message(entry['message'])
 
     def send_message(self):
         # You must implement this!
@@ -173,7 +199,10 @@ class MainApp(tk.Frame):
         pass
 
     def recipient_selected(self, recipient):
+        self.body.entry_editor.delete('1.0', tk.END)
         self.recipient = recipient
+        print(self.recipient)
+        self.list_contact_messages(self.recipient)
 
     def configure_server(self):
         ud = NewContactDialog(self.root, "Configure Account",
@@ -213,17 +242,19 @@ class MainApp(tk.Frame):
 
         # The Body and Footer classes must be initialized and
         # packed into the root window.
-        self.body = Body(self.root,
-                         recipient_selected_callback=self.recipient_selected)
+        self.body = Body(self.root, recipient_selected_callback=self.recipient_selected)
         self.body.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
         self.footer = Footer(self.root, send_callback=self.send_message)
         self.footer.pack(fill=tk.BOTH, side=tk.BOTTOM)
 
+
     def open_file(self):
-        if self.my_os == 'Windows':
-            os.startfile(os.getcwd())
-        else:
-            os.system('xdg-open .')
+        file_path = filedialog.askopenfilename(parent=self.root)
+        if file_path:
+            # Do something with the file
+            self.new_file_path = file_path
+            self.list_contacts()
+
 
     def new_file_creator(self):
         # Open a dialog box to get the filename and location
@@ -242,6 +273,7 @@ class MainApp(tk.Frame):
             '''
             # Calls the function to open a new window to save profile info
             self.biometrics_window()
+
 
     def biometrics_window(self):
         # Create a new window to prompt for user info
@@ -295,7 +327,6 @@ class MainApp(tk.Frame):
         new_ip_address = self.new_ip_entry.get()
 
         profile = Profile.Profile()
-        # profile.load_profile(self.new_file_path)
         profile.save_profile(self.new_file_path)
         profile.username = new_username
         profile.password = new_password
@@ -305,9 +336,9 @@ class MainApp(tk.Frame):
 
         # Close the user info window
         self.profile_window.destroy()
+        self.list_contacts()
     
     def cancel_window(self):
-
         self.profile_window.destroy()
 
 

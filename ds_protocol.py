@@ -7,6 +7,7 @@ of the dsu client module
 # 51514923
 
 import json
+import time
 from collections import namedtuple
 
 # Namedtuple to hold the values retrieved from json messages.
@@ -63,10 +64,12 @@ def send_dm(message, username, token):
     username = '"' + username + '"'
     message = '"' + message + '"'
     token = '"' + token + '"'
-    json_string = '{"token":{token}, "directmessage": {"entry": {message}, "recipient": {username}, "timestamp": "1603167689.3928561"}}'
+    timestamp = '"' + str(time.time()) + '"'
+    json_string = '{"token":{token}, "directmessage": {"entry": {message}, "recipient": {username}, "timestamp": {timestamp}}}'
     json_string = json_string.replace('{username}', username)
     json_string = json_string.replace('{message}', message)
     json_string = json_string.replace('{token}', token)
+    json_string = json_string.replace('{timestamp}', timestamp)
 
     return json_string
 

@@ -180,6 +180,20 @@ class Profile:
         self._messages.append(message)
 
     
+    def get_messages(self):
+        """
+        Returns a list of messages
+        """
+        return self._messages
+
+    
+    def get_friends(self):
+        """
+        Returns a list of friends
+        """
+        return self.friends
+
+    
     def add_author(self, friend):
         """
         Adds authors from messages
@@ -188,6 +202,7 @@ class Profile:
             self.friends.append(friend)
         else:
             pass
+
 
     def del_post(self, index: int) -> bool:
         """
