@@ -249,9 +249,11 @@ class MainApp(tk.Frame):
         # Create a new window to prompt for user info
         self.profile_window = tk.Toplevel(self.root)
         self.profile_window.title("Create Profile")
+        self.profile_window.resizable(False, False)
+        self.profile_window.grab_set()
 
         # Set color of new window
-        self.profile_window.configure(background="#4285f4")
+        # self.profile_window.configure(background="#4285f4")
 
         # Add Titles, Labels, Entries, and Buttons to the new window
         title = tk.Label(self.profile_window, text="Create Your Profile", font=("Impact", 16))
