@@ -230,8 +230,6 @@ class MainApp(tk.Frame):
         file_path = filedialog.asksaveasfilename(defaultextension=".dsu", filetypes=[('DSU files', '.dsu')])
         # Check if a filename was entered
         if file_path:
-            # Create the new file
-            open(file_path, 'a').close()
             # Saves the file path as a variable for Profile.py to use
             self.new_file_path = file_path
             print(self.new_file_path)
@@ -277,6 +275,7 @@ class MainApp(tk.Frame):
         ip_entry.grid(row=8, column=1)
 
         tk.Button(self.profile_window, text="Save", command=self.biomentrics_saver).grid(row=10, column=0, columnspan=2)
+        tk.Button(self.profile_window, text="Cancel", command=self.cancel_window).grid(row=11, column=0, columnspan=2)
 
         # Save the Entry widgets as instance variables so you can access their values later
         self.new_username_entry = username_entry
@@ -286,6 +285,9 @@ class MainApp(tk.Frame):
 
 
     def biomentrics_saver(self):
+        # Create the new file
+        open(self.new_file_path, 'a').close()
+
         # Get the values from the Entry widgets
         new_username = self.new_username_entry.get()
         new_password = self.new_password_entry.get()
@@ -302,6 +304,10 @@ class MainApp(tk.Frame):
         profile.save_profile(self.new_file_path)
 
         # Close the user info window
+        self.profile_window.destroy()
+    
+    def cancel_window(self):
+
         self.profile_window.destroy()
 
 
