@@ -2,8 +2,8 @@ import ds_messenger as dm
 import Profile as Pr
 
 
-dming = dm.DirectMessenger("168.235.86.101", "RizzyWeather", "weatherpass")
-data = dming.send("new overwatch message daddy", "RizzyWeather")
+dming = dm.DirectMessenger("168.235.86.101", "GUIusername", "GUIpassword")
+data = dming.send("this is working now for now", "RizzyWeather")
 
 # Retrieve ALLLLLL
 '''
@@ -20,10 +20,9 @@ for i in data:
 profile.save_profile("C:\\Users\\rrich\\PythonFiles\\Assignments\\Test Files\\WeatherJournal.dsu")
 '''
 
-
-# Retrieve NEWWWWW
 '''
-data = dming.retrieve_all()
+# Retrieve NEWWWWW
+data = dming.retrieve_new()
 
 profile = Pr.Profile()
 profile.load_profile("C:\\Users\\rrich\\PythonFiles\\Assignments\\Test Files\\WeatherJournal.dsu")

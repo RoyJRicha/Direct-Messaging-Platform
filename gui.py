@@ -162,7 +162,8 @@ class MainApp(tk.Frame):
         self.recipient = None
         self.new_file_path = None
         self.my_os = platform.system()
-        self.timer_number = None
+        self.message_timer_number = None
+        self.contact_timer_number = None
         # You must implement this! You must configure and
         # instantiate your DirectMessenger instance after this line.
         #self.direct_messenger = ... continue!
@@ -176,6 +177,7 @@ class MainApp(tk.Frame):
     def list_contacts(self):
         self.body.reset_tree()
         if self.new_file_path:
+            # self.check_new()
             profile = Profile.Profile()
             profile.load_profile(self.new_file_path)
             # print(profile._messages)
@@ -184,6 +186,24 @@ class MainApp(tk.Frame):
             contacts = profile.friends
             for contact in contacts:
                 self.body.insert_contact(contact)
+
+        # SUPPOSED TO BE ABLE REFRESH THE CONTACTS LIST, NOT WORKING FIX
+        # if self.contact_timer_number is not None:
+          #  self.root.after_cancel(self.contact_timer_number)
+        # make a new after call
+        #self.contact_timer_number = self.root.after(2000, self.list_contacts)
+    '''
+    def list_new_contacts(self):
+        friends_profile = Profile.Profile()
+        friends_profile.load_profile(self.new_file_path)
+        dming_friends = dm.DirectMessenger(friends_profile.dsuserver, friends_profile.username, friends_profile.password)
+        data = dming_friends.retrieve_new()
+        friends_profile.save_profile(self.new_file_path)
+        for friend in data:
+            new_friend = Profile.Message(friend.message, friend.recipient, friend.timestamp)
+            friends_profile
+        contacts = friends_profile.friends
+    '''
 
     def list_contact_messages(self):
         self.body.entry_editor.config(state='normal')
@@ -197,10 +217,10 @@ class MainApp(tk.Frame):
                 self.body.insert_contact_message(entry['message'])
         self.body.entry_editor.config(state='disabled')
         # cancel the previous after call, if it exists
-        if self.timer_number is not None:
-            self.root.after_cancel(self.timer_number)
+        if self.message_timer_number is not None:
+            self.root.after_cancel(self.message_timer_number)
         # make a new after call
-        self.timer_number = self.root.after(1000, self.list_contact_messages)
+        self.message_timer_number = self.root.after(1000, self.list_contact_messages)
 
     def send_message(self):
         # You must implement this!
