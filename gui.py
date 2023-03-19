@@ -43,15 +43,18 @@ class Body(tk.Frame):
     def insert_user_message(self, message:str):
         self.entry_editor.config(state='normal')
         self.entry_editor.insert(1.0, message + '\n', 'entry-right')
+        # self.entry_editor.yview_moveto(1)
         self.entry_editor.config(state='disabled')
 
     def insert_contact_message(self, message:str):
         self.entry_editor.config(state='normal')
         self.entry_editor.insert(1.0, message + '\n', 'entry-left')
+        # self.entry_editor.yview_moveto(1)
         self.entry_editor.config(state='disabled')
 
     def get_text_entry(self) -> str:
-        return self.message_editor.get('1.0', 'end').rstrip()
+        print('GET')
+        return self.message_editor.get('1.0', tk.END).strip()
 
     def set_text_entry(self, text:str):
         self.message_editor.delete(1.0, tk.END)
@@ -100,14 +103,20 @@ class Footer(tk.Frame):
         tk.Frame.__init__(self, root)
         self.root = root
         self._send_callback = send_callback
+        self.body = Body(root)
         self._draw()
 
     def send_click(self):
+        text = self.body.get_text_entry()
+        print('String', text)
         if self._send_callback is not None:
             self._send_callback()
 
+    # def get_text_entry(self):
+        # return self.text_entry.get()
+
     def _draw(self):
-        save_button = tk.Button(master=self, text="Send", width=20)
+        save_button = tk.Button(master=self, text="Send", width=20, command=self.send_click)
         # You must implement this.
         # Here you must configure the button to bind its click to
         # the send_click() function.
@@ -115,6 +124,8 @@ class Footer(tk.Frame):
 
         self.footer_label = tk.Label(master=self, text="Ready.")
         self.footer_label.pack(fill=tk.BOTH, side=tk.LEFT, padx=5)
+
+        # self.get_text_entry.bind("<Return>", lambda event: self.send_click())
 
 
 class NewContactDialog(tk.simpledialog.Dialog):
@@ -177,7 +188,7 @@ class MainApp(tk.Frame):
     def list_contacts(self):
         self.body.reset_tree()
         if self.new_file_path:
-            # self.check_new()
+            self.check_new()
             profile = Profile.Profile()
             profile.load_profile(self.new_file_path)
             # print(profile._messages)
@@ -188,10 +199,10 @@ class MainApp(tk.Frame):
                 self.body.insert_contact(contact)
 
         # SUPPOSED TO BE ABLE REFRESH THE CONTACTS LIST, NOT WORKING FIX
-        # if self.contact_timer_number is not None:
-          #  self.root.after_cancel(self.contact_timer_number)
+        if self.contact_timer_number is not None:
+          self.root.after_cancel(self.contact_timer_number)
         # make a new after call
-        #self.contact_timer_number = self.root.after(2000, self.list_contacts)
+        self.contact_timer_number = self.root.after(2000, self.list_contacts)
     
     # FIX THIS
     '''
@@ -209,6 +220,7 @@ class MainApp(tk.Frame):
 
     def list_contact_messages(self):
         self.body.entry_editor.config(state='normal')
+        cur_pos = self.body.entry_editor.yview()[0]
         self.body.entry_editor.delete('1.0', tk.END)
         self.check_new()
         profile = Profile.Profile()
@@ -222,6 +234,7 @@ class MainApp(tk.Frame):
         if self.message_timer_number is not None:
             self.root.after_cancel(self.message_timer_number)
         # make a new after call
+        self.body.entry_editor.yview(tk.MOVETO, cur_pos)
         self.message_timer_number = self.root.after(1000, self.list_contact_messages)
 
     def send_message(self):

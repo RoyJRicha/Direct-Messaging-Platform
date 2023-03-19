@@ -2,8 +2,8 @@ import ds_messenger as dm
 import Profile as Pr
 
 
-dming = dm.DirectMessenger("168.235.86.101", "GUIusername", "GUIpassword")
-data = dming.send("this is working now for now", "RizzyWeather")
+dming = dm.DirectMessenger("168.235.86.101", "RizzyWeather", "weatherpass")
+data = dming.send("RIZZY is working now for now", "GUIusername")
 
 # Retrieve ALLLLLL
 '''
