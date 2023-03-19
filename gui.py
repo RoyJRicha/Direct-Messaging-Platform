@@ -5,6 +5,7 @@ import os
 import platform
 import subprocess
 import Profile as Profile
+import ds_messenger as dm
 
 
 class Body(tk.Frame):
@@ -40,10 +41,14 @@ class Body(tk.Frame):
         id = self.posts_tree.insert('', id, id, text=contact)
 
     def insert_user_message(self, message:str):
+        self.entry_editor.config(state='normal')
         self.entry_editor.insert(1.0, message + '\n', 'entry-right')
+        self.entry_editor.config(state='disabled')
 
     def insert_contact_message(self, message:str):
+        self.entry_editor.config(state='normal')
         self.entry_editor.insert(1.0, message + '\n', 'entry-left')
+        self.entry_editor.config(state='disabled')
 
     def get_text_entry(self) -> str:
         return self.message_editor.get('1.0', 'end').rstrip()
@@ -77,7 +82,7 @@ class Body(tk.Frame):
         self.message_editor.pack(fill=tk.BOTH, side=tk.LEFT,
                                  expand=True, padx=0, pady=0)
 
-        self.entry_editor = tk.Text(editor_frame, width=0, height=5)
+        self.entry_editor = tk.Text(editor_frame, width=0, height=5, state="disabled")
         self.entry_editor.tag_configure('entry-right', justify='right')
         self.entry_editor.tag_configure('entry-left', justify='left')
         self.entry_editor.pack(fill=tk.BOTH, side=tk.LEFT,
@@ -179,13 +184,18 @@ class MainApp(tk.Frame):
             for contact in contacts:
                 self.body.insert_contact(contact)
 
-    def list_contact_messages(self, recipient):
+    def list_contact_messages(self):
+        self.body.entry_editor.config(state='normal')
+        self.body.entry_editor.delete('1.0', tk.END)
+        self.check_new()
         profile = Profile.Profile()
         profile.load_profile(self.new_file_path)
         messages = profile._messages
         for entry in reversed(messages):
-            if recipient == entry['author']:
+            if self.recipient == entry['author']:
                 self.body.insert_contact_message(entry['message'])
+        self.body.entry_editor.config(state='disabled')
+        self.root.after(1000, self.list_contact_messages)
 
     def send_message(self):
         # You must implement this!
@@ -199,10 +209,13 @@ class MainApp(tk.Frame):
         pass
 
     def recipient_selected(self, recipient):
+        self.body.entry_editor.config(state='normal')
         self.body.entry_editor.delete('1.0', tk.END)
         self.recipient = recipient
         print(self.recipient)
-        self.list_contact_messages(self.recipient)
+        self.list_contact_messages()
+        self.body.entry_editor.config(state='disabled')
+
 
     def configure_server(self):
         ud = NewContactDialog(self.root, "Configure Account",
@@ -218,9 +231,20 @@ class MainApp(tk.Frame):
         # You must implement this!
         pass
 
+    
     def check_new(self):
-        # You must implement this!
-        pass
+        if self.new_file_path:
+            check_profile = Profile.Profile()
+            check_profile.load_profile(self.new_file_path)
+            dming = dm.DirectMessenger(check_profile.dsuserver, check_profile.username, check_profile.password)
+            data = dming.retrieve_new()
+            check_profile.save_profile(self.new_file_path)
+            for entry in data:
+                new_message = Profile.Message(entry.message, entry.recipient, entry.timestamp)
+                check_profile.add_author(entry.recipient)
+                check_profile.add_message(new_message)
+            check_profile.save_profile(self.new_file_path)
+
 
     def _draw(self):
         # Build a menu and add it to the root frame.
