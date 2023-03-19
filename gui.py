@@ -162,6 +162,7 @@ class MainApp(tk.Frame):
         self.recipient = None
         self.new_file_path = None
         self.my_os = platform.system()
+        self.timer_number = None
         # You must implement this! You must configure and
         # instantiate your DirectMessenger instance after this line.
         #self.direct_messenger = ... continue!
@@ -195,7 +196,11 @@ class MainApp(tk.Frame):
             if self.recipient == entry['author']:
                 self.body.insert_contact_message(entry['message'])
         self.body.entry_editor.config(state='disabled')
-        self.root.after(1000, self.list_contact_messages)
+        # cancel the previous after call, if it exists
+        if self.timer_number is not None:
+            self.root.after_cancel(self.timer_number)
+        # make a new after call
+        self.timer_number = self.root.after(1000, self.list_contact_messages)
 
     def send_message(self):
         # You must implement this!

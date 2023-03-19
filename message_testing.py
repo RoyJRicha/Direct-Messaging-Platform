@@ -3,7 +3,7 @@ import Profile as Pr
 
 
 dming = dm.DirectMessenger("168.235.86.101", "RizzyWeather", "weatherpass")
-data = dming.send("TROLLLLLPINGNANSDNFKLASNFALKSDFN", "crykor")
+data = dming.send("new overwatch message daddy", "RizzyWeather")
 
 # Retrieve ALLLLLL
 '''
