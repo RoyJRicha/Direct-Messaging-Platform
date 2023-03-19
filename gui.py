@@ -192,6 +192,8 @@ class MainApp(tk.Frame):
           #  self.root.after_cancel(self.contact_timer_number)
         # make a new after call
         #self.contact_timer_number = self.root.after(2000, self.list_contacts)
+    
+    # FIX THIS
     '''
     def list_new_contacts(self):
         friends_profile = Profile.Profile()
