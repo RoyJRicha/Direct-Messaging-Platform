@@ -42,7 +42,7 @@ class Body(tk.Frame):
 
     def insert_user_message(self, message:str):
         self.entry_editor.config(state='normal')
-        self.entry_editor.insert(1.0, message + '\n', 'entry-right')
+        self.entry_editor.insert('end', message + '\n', 'entry-right')
         # self.entry_editor.yview_moveto(1)
         self.entry_editor.config(state='disabled')
 
@@ -53,12 +53,11 @@ class Body(tk.Frame):
         self.entry_editor.config(state='disabled')
 
     def get_text_entry(self) -> str:
-        print('GET')
+        print(self.message_editor.get('1.0', tk.END).strip())
         return self.message_editor.get('1.0', tk.END).strip()
 
-    def set_text_entry(self, text:str):
+    def set_text_entry(self):
         self.message_editor.delete(1.0, tk.END)
-        self.message_editor.insert(1.0, text)
 
     def _draw(self):
         posts_frame = tk.Frame(master=self, width=250)
@@ -107,13 +106,8 @@ class Footer(tk.Frame):
         self._draw()
 
     def send_click(self):
-        text = self.body.get_text_entry()
-        print('String', text)
         if self._send_callback is not None:
             self._send_callback()
-
-    # def get_text_entry(self):
-        # return self.text_entry.get()
 
     def _draw(self):
         save_button = tk.Button(master=self, text="Send", width=20, command=self.send_click)
@@ -122,10 +116,13 @@ class Footer(tk.Frame):
         # the send_click() function.
         save_button.pack(fill=tk.BOTH, side=tk.RIGHT, padx=5, pady=5)
 
+        # FIX THIS TO ALLOW THE ENTER BUTTON TO BE PRESSED TO SEND
+        # save_button.bind("<Return>", self.send_click)
+
         self.footer_label = tk.Label(master=self, text="Ready.")
         self.footer_label.pack(fill=tk.BOTH, side=tk.LEFT, padx=5)
 
-        # self.get_text_entry.bind("<Return>", lambda event: self.send_click())
+        #self.body.get_text_entry.bind("<Return>", lambda event: self.send_click())
 
 
 class NewContactDialog(tk.simpledialog.Dialog):
@@ -238,8 +235,12 @@ class MainApp(tk.Frame):
         self.message_timer_number = self.root.after(1000, self.list_contact_messages)
 
     def send_message(self):
-        # You must implement this!
-        pass
+        # You must implement this
+        text = self.body.get_text_entry()
+        print('Message', text)
+        self.body.set_text_entry()
+        if (text != "") and (text.isspace() is False):
+            self.body.insert_user_message(text)
 
     def add_contact(self):
         # You must implement this!

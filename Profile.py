@@ -130,6 +130,42 @@ class Message(dict):
         self._author = author
         dict.__setitem__(self, 'author', author)
 
+class Sent(dict):
+    """
+    Message class is responsible for working with individual user messages. It
+    supports three features: Timestamp property that is set on instantiation/
+    when entry object is set and an entry property that stores post message,
+    and the user who sent the message.
+    """
+
+    def __init__(self, message: str = None, recipient: str = None, timestamp: float = 0):
+        '''
+        Variable instantiation
+        '''
+        self._timestamp = timestamp
+        self.add_message(message)
+        self.add_recipient(recipient)
+
+        # Subclass dict to expose Post properties for serialization
+        # Don't worry about this!
+        dict.__init__(self, message=self._message, recipient=self._recipient, timestamp=self._timestamp)
+
+
+    def add_message(self, message):
+        '''
+        Sets the message
+        '''
+        self._message = message
+        dict.__setitem__(self, 'message', message)
+
+
+    def add_recipient(self, recipient):
+        '''
+        Sets the message
+        '''
+        self._recipient = recipient
+        dict.__setitem__(self, 'recipient', recipient)
+
 
 class Profile:
     """
@@ -157,6 +193,7 @@ class Profile:
         self._posts = []         # OPTIONAL
         self._messages = []
         self.friends = []
+        self._sent_messages = []
 
 
     def add_post(self, post: Post) -> None:
@@ -178,6 +215,12 @@ class Profile:
         users
         """
         self._messages.append(message)
+
+    def add_sent_messages(self, message):
+        """
+        Adds messages sent
+        """
+        self._sent_messages.append(message)
 
     
     def get_messages(self):
@@ -290,6 +333,9 @@ class Profile:
                     self._messages.append(msg)
                 for friend_obj in obj['friends']:
                     self.friends.append(friend_obj)
+                for msg_obj in obj['_sent_messages']:
+                    msg = Sent(msg_obj['message'], msg_obj['recipient'], msg_obj['timestamp'])
+                    self._sent_messages.append(msg)
                 f.close()
             except Exception as ex:
                 raise DsuProfileError(ex)

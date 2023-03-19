@@ -152,7 +152,7 @@ class DirectMessenger:
     def send(self, message:str, recipient:str) -> bool:
         # must return true if message successfully sent, false if send failed.
         results, c_socket = self.retrieve_token()
-
+        print(recipient)
         # Accessing the username and password
         if results is True:
             try:

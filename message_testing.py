@@ -1,9 +1,21 @@
 import ds_messenger as dm
 import Profile as Pr
+import time
 
+message = "YAYYYYYYY"
+dming = dm.DirectMessenger("168.235.86.101", "GUIusername", "GUIpassword")
+data = dming.send(message, "Sender")
 
-dming = dm.DirectMessenger("168.235.86.101", "RizzyWeather", "weatherpass")
-data = dming.send("RIZZY is working now for now", "GUIusername")
+timestamp = time.time()
+profile = Pr.Profile()
+profile.load_profile("C:\\Users\\rrich\\PythonFiles\\Assignments\\Test Files\\GUITest.dsu")
+profile.save_profile("C:\\Users\\rrich\\PythonFiles\\Assignments\\Test Files\\GUITest.dsu")
+new_message = Pr.Sent(message, "Sender", timestamp)
+profile.add_author("Sender")
+profile.add_sent_messages(new_message)
+
+profile.save_profile("C:\\Users\\rrich\\PythonFiles\\Assignments\\Test Files\\GUITest.dsu")
+
 
 # Retrieve ALLLLLL
 '''
