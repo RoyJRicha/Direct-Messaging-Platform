@@ -216,13 +216,19 @@ class Profile:
         """
         self._messages.append(message)
 
+
     def add_sent_messages(self, message):
         """
         Adds messages sent
         """
         self._sent_messages.append(message)
 
-    
+    def get_sent_messages(self):
+        """
+        Returns a list of sent messages
+        """
+        return self._sent_messages
+
     def get_messages(self):
         """
         Returns a list of messages
