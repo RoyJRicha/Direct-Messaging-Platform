@@ -2,7 +2,7 @@ import ds_messenger as dm
 import Profile as Pr
 import time
 
-message = "YESSSSSSSSSSS"
+message = "hiiihihihih"
 dming = dm.DirectMessenger("168.235.86.101", "GUIusername", "GUIpassword")
 data = dming.send(message, "Sender")
 

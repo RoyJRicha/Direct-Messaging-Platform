@@ -6,6 +6,7 @@ import platform
 import subprocess
 import Profile as Profile
 import ds_messenger as dm
+import time
 
 
 class Body(tk.Frame):
@@ -240,7 +241,24 @@ class MainApp(tk.Frame):
         print('Message', text)
         self.body.set_text_entry()
         if (text != "") and (text.isspace() is False):
-            self.body.insert_user_message(text)
+            profile = Profile.Profile()
+            profile.load_profile(self.new_file_path)
+            profile.save_profile(self.new_file_path)
+            server = profile.dsuserver
+            username = profile.username
+            password = profile.password
+            dming = dm.DirectMessenger(server, username, password)
+            result = dming.send(text, self.recipient)
+            if result is True:
+                self.body.insert_user_message(text)
+                timestamp = time.time()
+                store_new_message = Profile.Sent(text, self.recipient, timestamp)
+                profile.add_author(self.recipient)
+                profile.add_sent_messages(store_new_message)
+                profile.save_profile(self.new_file_path)
+            else:
+                print('ERROR: Could not send message (make GUI error for the future)')
+            
 
     def add_contact(self):
         # You must implement this!
