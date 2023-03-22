@@ -2,6 +2,7 @@ import ds_messenger as dm
 import Profile as Pr
 import time
 
+
 message = "hiiihihihih"
 dming = dm.DirectMessenger("168.235.86.101", "GUIusername", "GUIpassword")
 data = dming.send(message, "Sender")
@@ -15,7 +16,6 @@ profile.add_author("Sender")
 profile.add_sent_messages(new_message)
 
 profile.save_profile("C:\\Users\\rrich\\PythonFiles\\Assignments\\Test Files\\GUITest.dsu")
-
 
 # Retrieve ALLLLLL
 '''
@@ -45,4 +45,13 @@ for i in data:
     profile.add_message(new_message)
 
 profile.save_profile("C:\\Users\\rrich\\PythonFiles\\Assignments\\Test Files\\WeatherJournal.dsu")
+'''
+
+'''
+import datetime
+import time
+
+time = datetime.datetime.fromtimestamp(1679516335.0818863).strftime("%d/%m/%Y %I:%M %p")
+
+print(time)
 '''

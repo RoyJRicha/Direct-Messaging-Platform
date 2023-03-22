@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, messagebox
 from typing import Text
 import os
 import platform
@@ -165,6 +165,12 @@ class NewContactDialog(tk.simpledialog.Dialog):
         # * symbols.
         #self.password...
 
+        self.password_label = tk.Label(frame, width=30, text="Password")
+        self.password_label.pack()
+        self.password_entry = tk.Entry(frame, width=30)
+        self.password_entry.insert(tk.END, self.user)
+        self.password_entry.pack()
+
 
     def apply(self):
         self.user = self.username_entry.get()
@@ -283,27 +289,30 @@ class MainApp(tk.Frame):
             
 
     def add_contact(self):
-        self.contact_window = tk.Toplevel(self.root)
-        self.contact_window.title("Add Contact")
-        self.contact_window.resizable(False, False)
-        self.contact_window.grab_set()
+        if self.new_file_path:
+            self.contact_window = tk.Toplevel(self.root)
+            self.contact_window.title("Add Contact")
+            self.contact_window.resizable(False, False)
+            self.contact_window.grab_set()
 
-        # Set color of new window
-        # self.contact_window.configure(background="#4285f4")
+            # Set color of new window
+            # self.contact_window.configure(background="#4285f4")
 
-        # Add Titles, Labels, Entries, and Buttons to the new window
-        title = tk.Label(self.contact_window, text="Add Contact", font=("Impact", 16))
-        # title.place(relx=0.5, rely=0.0, anchor="center")
-        title.grid(row=0, column=1)
+            # Add Titles, Labels, Entries, and Buttons to the new window
+            title = tk.Label(self.contact_window, text="Add Contact", font=("Impact", 16))
+            # title.place(relx=0.5, rely=0.0, anchor="center")
+            title.grid(row=0, column=1)
 
-        tk.Label(self.contact_window, text="Name", font=("Verdana", 10)).grid(row=2, column=0)
-        contact_entry = tk.Entry(self.contact_window)
-        contact_entry.grid(row=2, column=1)
+            tk.Label(self.contact_window, text="Name", font=("Verdana", 10)).grid(row=2, column=0)
+            contact_entry = tk.Entry(self.contact_window)
+            contact_entry.grid(row=2, column=1)
 
-        tk.Button(self.contact_window, text="Save", command=self.new_contact_saver).grid(row=10, column=0, columnspan=2)
-        tk.Button(self.contact_window, text="Cancel", command=self.cancel_window_2).grid(row=11, column=0, columnspan=2)
+            tk.Button(self.contact_window, text="Save", command=self.new_contact_saver).grid(row=10, column=0, columnspan=2)
+            tk.Button(self.contact_window, text="Cancel", command=self.cancel_window_2).grid(row=11, column=0, columnspan=2)
 
-        self.new_contact_entry = contact_entry
+            self.new_contact_entry = contact_entry
+        else:
+            messagebox.showerror("Error", "Load File Before Adding Contacts")
 
     def new_contact_saver(self):
         new_contact = self.new_contact_entry.get()
@@ -332,14 +341,102 @@ class MainApp(tk.Frame):
 
 
     def configure_server(self):
+        '''
         ud = NewContactDialog(self.root, "Configure Account",
                               self.username, self.password, self.server)
         self.username = ud.user
         self.password = ud.pwd
         self.server = ud.server
+        '''
         # You must implement this!
         # You must configure and instantiate your
         # DirectMessenger instance after this line.
+        # Create a new window to prompt for user info
+        if self.new_file_path:
+            self.edit_window = tk.Toplevel(self.root)
+            self.edit_window.title("Configure Profile")
+            self.edit_window.resizable(False, False)
+            self.edit_window.grab_set()
+
+            profile = Profile.Profile()
+            profile.load_profile(self.new_file_path)
+            # Set color of new window
+            # self.edit_window.configure(background="#4285f4")
+
+            # Add Titles, Labels, Entries, and Buttons to the new window
+            title = tk.Label(self.edit_window, text="  Configure Your Profile", font=("Impact", 16))
+            # title.place(relx=0.5, rely=0.0, anchor="center")
+            title.grid(row=0, column=1, columnspan=1)
+
+            tk.Label(self.edit_window, text="Current", font=("Verdana 13 underline")).grid(row=2, column=1)
+            tk.Label(self.edit_window, text="New", font=("Verdana 13 underline")).grid(row=2, column=2)
+            tk.Label(self.edit_window, text=" ", font=("Verdana 13")).grid(row=2, column=3)
+
+            tk.Label(self.edit_window, text="IP Address:", font=("Verdana", 10)).grid(row=4, column=0)
+            tk.Label(self.edit_window, text=profile.dsuserver, font=("Verdana", 10)).grid(row=4, column=1)
+            ip_entry = tk.Entry(self.edit_window)
+            ip_entry.grid(row=4, column=2)
+
+            tk.Label(self.edit_window, text="Username:", font=("Verdana", 10)).grid(row=6, column=0)
+            tk.Label(self.edit_window, text=profile.username, font=("Verdana", 10)).grid(row=6, column=1)
+            self.user_entry = tk.Entry(self.edit_window)
+            self.user_entry.grid(row=6, column=2)
+
+            tk.Label(self.edit_window, text="Password:", font=("Verdana", 10)).grid(row=8, column=0)
+            tk.Label(self.edit_window, text=profile.password, font=("Verdana", 10)).grid(row=8, column=1)
+            self.pass_entry = tk.Entry(self.edit_window, show="*")
+            self.pass_entry.grid(row=8, column=2)
+
+            self.pass_entry.configure(state="disabled")
+            self.user_entry.bind("<KeyRelease>", self.on_username_entry_change)
+            # self.pass_entry.configure(state="disabled")
+            '''
+            if (username_entry.get() == "") or (username_entry.get().isspace() is True):
+                pass_entry.configure(state="disabled")
+            else:
+                pass_entry.configure(state="normal")
+            '''
+            
+
+            tk.Button(self.edit_window, text="Save", command=self.biomentrics_saver, bg="#A6E6EE").grid(row=10, column=0, columnspan=2)
+            tk.Button(self.edit_window, text="Cancel", command=self.cancel_window_3, bg="#EC9898").grid(row=10, column=1, columnspan=2)
+
+            # Save the Entry widgets as instance variables so you can access their values later
+            self.new_username_entry = self.user_entry
+            self.new_password_entry = self.pass_entry
+            self.new_ip_entry = ip_entry
+        else:
+            messagebox.showerror("Error", "Load File Before Configuring")
+
+    '''
+    def enable_password_entry(self, event):
+        self.pass_entry.configure(state="normal")
+    '''
+
+    def on_username_entry_change(self, event):
+        if len(self.user_entry.get().strip()) > 0:
+            self.pass_entry.configure(state="normal")
+        else:
+            self.pass_entry.delete(0, tk.END)
+            self.pass_entry.configure(state="disabled")
+
+    def edit_saver(self):
+        '''
+        edited_username = self.new_username_entry.get()
+        edited_password = self.new_password_entry.get()
+        edited_ip = self.new_ip_entry.get()
+
+        edited_profile = Profile.Profile()
+        edited_profile.load_profile(self.new_file_path)
+        edited_profile.save_profile(self.new_file_path)
+        edited_profile
+        '''
+        pass
+
+
+    def cancel_window_3(self):
+        self.edit_window.destroy()
+
 
     def publish(self, message:str):
         # You must implement this!
