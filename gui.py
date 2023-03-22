@@ -63,7 +63,6 @@ class Body(tk.Frame):
     '''
 
     def get_text_entry(self) -> str:
-        print(self.message_editor.get('1.0', tk.END).strip())
         return self.message_editor.get('1.0', tk.END).strip()
 
     def set_text_entry(self):
@@ -128,6 +127,9 @@ class Footer(tk.Frame):
 
         # FIX THIS TO ALLOW THE ENTER BUTTON TO BE PRESSED TO SEND
         # save_button.bind("<Return>", self.send_click)
+        # self.body.message_editor.bind("<Return>", lambda event: "break")
+        # self.body.message_editor.bind('<Return>', lambda event: (self.send_click(), "break"))
+        # self.body.message_editor.bind('<Return>', lambda event: save_button.invoke())
 
         self.footer_label = tk.Label(master=self, text="Ready.")
         self.footer_label.pack(fill=tk.BOTH, side=tk.LEFT, padx=5)
@@ -281,11 +283,44 @@ class MainApp(tk.Frame):
             
 
     def add_contact(self):
-        # You must implement this!
-        # Hint: check how to use tk.simpledialog.askstring to retrieve
-        # the name of the new contact, and then use one of the body
-        # methods to add the contact to your contact list
-        pass
+        self.contact_window = tk.Toplevel(self.root)
+        self.contact_window.title("Add Contact")
+        self.contact_window.resizable(False, False)
+        self.contact_window.grab_set()
+
+        # Set color of new window
+        # self.contact_window.configure(background="#4285f4")
+
+        # Add Titles, Labels, Entries, and Buttons to the new window
+        title = tk.Label(self.contact_window, text="Add Contact", font=("Impact", 16))
+        # title.place(relx=0.5, rely=0.0, anchor="center")
+        title.grid(row=0, column=1)
+
+        tk.Label(self.contact_window, text="Name", font=("Verdana", 10)).grid(row=2, column=0)
+        contact_entry = tk.Entry(self.contact_window)
+        contact_entry.grid(row=2, column=1)
+
+        tk.Button(self.contact_window, text="Save", command=self.new_contact_saver).grid(row=10, column=0, columnspan=2)
+        tk.Button(self.contact_window, text="Cancel", command=self.cancel_window_2).grid(row=11, column=0, columnspan=2)
+
+        self.new_contact_entry = contact_entry
+
+    def new_contact_saver(self):
+        new_contact = self.new_contact_entry.get()
+        print('TYPE', new_contact)
+
+        profile = Profile.Profile()
+        profile.load_profile(self.new_file_path)
+        profile.save_profile(self.new_file_path)
+        profile.add_author(new_contact)
+        profile.save_profile(self.new_file_path)
+
+        self.contact_window.destroy()
+
+
+    def cancel_window_2(self):
+        self.contact_window.destroy()
+
 
     def recipient_selected(self, recipient):
         self.body.entry_editor.config(state='normal')
