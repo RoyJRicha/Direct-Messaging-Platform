@@ -43,14 +43,14 @@ class Body(tk.Frame):
 
     def insert_user_message(self, message:str):
         self.entry_editor.config(state='normal')
-        self.entry_editor.insert('end', message + '\n', 'entry-right')
-        # self.entry_editor.yview_moveto(1)
+        self.entry_editor.tag_configure('blue_rounded_edge', foreground='white', background='#0077be', borderwidth=1, relief='ridge', font=('Arial', 10, 'normal'), justify='right')
+        self.entry_editor.insert(1.0, message + '\n', 'blue_rounded_edge')
         self.entry_editor.config(state='disabled')
 
     def insert_contact_message(self, message:str):
         self.entry_editor.config(state='normal')
-        self.entry_editor.insert(1.0, message + '\n', 'entry-left')
-        # self.entry_editor.yview_moveto(1)
+        self.entry_editor.tag_configure('green_rounded_edge', foreground='white', background='#85c8a3', borderwidth=1, relief='ridge', font=('Arial', 10, 'normal'), justify='left')
+        self.entry_editor.insert(1.0, message + '\n', 'green_rounded_edge')
         self.entry_editor.config(state='disabled')
 
     def get_text_entry(self) -> str:
@@ -224,9 +224,20 @@ class MainApp(tk.Frame):
         profile = Profile.Profile()
         profile.load_profile(self.new_file_path)
         messages = profile._messages
-        for entry in reversed(messages):
+        sent_messages = profile._sent_messages
+        all_messages_lst = []
+        for entry in messages:
             if self.recipient == entry['author']:
-                self.body.insert_contact_message(entry['message'])
+                all_messages_lst.append(entry)
+        for sent in sent_messages:
+            if self.recipient == sent['recipient']:
+                all_messages_lst.append(sent)
+        sorted_message_lst = sorted(all_messages_lst, key=lambda x: float(x["timestamp"]), reverse=True)
+        for dm in sorted_message_lst:
+            if "author" in dm:
+                self.body.insert_contact_message(dm['message'])
+            elif "recipient" in dm:
+                self.body.insert_user_message(dm['message'])
         self.body.entry_editor.config(state='disabled')
         # cancel the previous after call, if it exists
         if self.message_timer_number is not None:
@@ -251,7 +262,7 @@ class MainApp(tk.Frame):
             result = dming.send(text, self.recipient)
             if result is True:
                 self.body.insert_user_message(text)
-                timestamp = time.time()
+                timestamp = str(time.time())
                 store_new_message = Profile.Sent(text, self.recipient, timestamp)
                 profile.add_author(self.recipient)
                 profile.add_sent_messages(store_new_message)
