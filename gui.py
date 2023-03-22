@@ -43,15 +43,24 @@ class Body(tk.Frame):
 
     def insert_user_message(self, message:str):
         self.entry_editor.config(state='normal')
-        self.entry_editor.tag_configure('blue_rounded_edge', foreground='white', background='#0077be', borderwidth=1, relief='ridge', font=('Arial', 10, 'normal'), justify='right')
+        self.entry_editor.tag_configure('blue_rounded_edge', foreground='black', background='#0077be', borderwidth=1, relief='ridge', font=('Arial', 10, 'normal'), justify='right')
         self.entry_editor.insert(1.0, message + '\n', 'blue_rounded_edge')
         self.entry_editor.config(state='disabled')
 
     def insert_contact_message(self, message:str):
         self.entry_editor.config(state='normal')
-        self.entry_editor.tag_configure('green_rounded_edge', foreground='white', background='#85c8a3', borderwidth=1, relief='ridge', font=('Arial', 10, 'normal'), justify='left')
+        self.entry_editor.tag_configure('green_rounded_edge', foreground='black', background='#85c8a3', borderwidth=1, relief='ridge', font=('Arial', 10, 'normal'), justify='left')
         self.entry_editor.insert(1.0, message + '\n', 'green_rounded_edge')
         self.entry_editor.config(state='disabled')
+
+    '''
+    import datetime
+    import time
+
+    time = datetime.datetime.fromtimestamp(time.time()).strftime("%d/%m/%Y %I:%M %p")
+
+    print(time)
+    '''
 
     def get_text_entry(self) -> str:
         print(self.message_editor.get('1.0', tk.END).strip())
