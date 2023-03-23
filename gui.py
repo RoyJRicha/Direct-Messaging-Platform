@@ -261,7 +261,7 @@ class MainApp(tk.Frame):
             self.root.after_cancel(self.message_timer_number)
         # make a new after call
         self.body.entry_editor.yview(tk.MOVETO, cur_pos)
-        self.message_timer_number = self.root.after(1000, self.list_contact_messages)
+        self.message_timer_number = self.root.after(250, self.list_contact_messages)
 
     def send_message(self):
         # You must implement this
@@ -278,7 +278,7 @@ class MainApp(tk.Frame):
             dming = dm.DirectMessenger(server, username, password)
             result = dming.send(text, self.recipient)
             if result is True:
-                self.body.insert_user_message(text)
+                # self.body.insert_user_message(text)
                 timestamp = str(time.time())
                 store_new_message = Profile.Sent(text, self.recipient, timestamp)
                 profile.add_author(self.recipient)
@@ -388,7 +388,7 @@ class MainApp(tk.Frame):
             self.pass_entry.grid(row=8, column=2)
 
             self.pass_entry.configure(state="disabled")
-            self.user_entry.bind("<KeyRelease>", self.on_username_entry_change)
+            self.user_entry.bind("<KeyRelease>", self.username_entry_change)
             # self.pass_entry.configure(state="disabled")
             '''
             if (username_entry.get() == "") or (username_entry.get().isspace() is True):
@@ -398,7 +398,7 @@ class MainApp(tk.Frame):
             '''
             
 
-            tk.Button(self.edit_window, text="Save", command=self.biomentrics_saver, bg="#A6E6EE").grid(row=10, column=0, columnspan=2)
+            tk.Button(self.edit_window, text="Save", command=self.edit_saver, bg="#A6E6EE").grid(row=10, column=0, columnspan=2)
             tk.Button(self.edit_window, text="Cancel", command=self.cancel_window_3, bg="#EC9898").grid(row=10, column=1, columnspan=2)
 
             # Save the Entry widgets as instance variables so you can access their values later
@@ -413,7 +413,7 @@ class MainApp(tk.Frame):
         self.pass_entry.configure(state="normal")
     '''
 
-    def on_username_entry_change(self, event):
+    def username_entry_change(self, event):
         if len(self.user_entry.get().strip()) > 0:
             self.pass_entry.configure(state="normal")
         else:
@@ -421,17 +421,46 @@ class MainApp(tk.Frame):
             self.pass_entry.configure(state="disabled")
 
     def edit_saver(self):
-        '''
         edited_username = self.new_username_entry.get()
         edited_password = self.new_password_entry.get()
         edited_ip = self.new_ip_entry.get()
+        error = False
+        error_code = ""
+
+        print('IP Address:', edited_ip)
+        print('Username:', edited_username)
+        print('Password', edited_password)
+
 
         edited_profile = Profile.Profile()
         edited_profile.load_profile(self.new_file_path)
         edited_profile.save_profile(self.new_file_path)
-        edited_profile
-        '''
-        pass
+        if (edited_ip.isspace() is False) and (edited_ip != "") and (" " not in edited_ip):
+            print('Saved IP Address:', edited_ip)
+            edited_profile.dsuserver = edited_ip
+        elif (edited_ip.isspace() is True) or (" " in edited_ip):
+            error = True
+            error_code += "IP Address Includes Spaces\n"
+        if (edited_username.isspace() is False) and (edited_username != "") and (" " not in edited_username):
+            print('Saved Username:', edited_username)
+            edited_profile.username = edited_username
+        elif (edited_username.isspace() is True) or (" " in edited_username):
+            error = True
+            error_code += "Username Includes Spaces\n"
+        if (edited_password.isspace() is False) and (edited_password != "") and (" " not in edited_password):
+            print('Saved Password', edited_password)
+            edited_profile.password = edited_password
+        elif (edited_password.isspace() is True) or (" " in edited_password):
+            error = True
+            error_code += "Password Includes Spaces\n"
+        
+        if error is True:
+            messagebox.showerror("Error", error_code)
+        else:
+            edited_profile.save_profile(self.new_file_path)
+            self.edit_window.destroy()
+
+        
 
 
     def cancel_window_3(self):
@@ -449,12 +478,15 @@ class MainApp(tk.Frame):
             check_profile.load_profile(self.new_file_path)
             dming = dm.DirectMessenger(check_profile.dsuserver, check_profile.username, check_profile.password)
             data = dming.retrieve_new()
-            check_profile.save_profile(self.new_file_path)
-            for entry in data:
-                new_message = Profile.Message(entry.message, entry.recipient, entry.timestamp)
-                check_profile.add_author(entry.recipient)
-                check_profile.add_message(new_message)
-            check_profile.save_profile(self.new_file_path)
+            if data is not False:
+                check_profile.save_profile(self.new_file_path)
+                for entry in data:
+                    new_message = Profile.Message(entry.message, entry.recipient, entry.timestamp)
+                    check_profile.add_author(entry.recipient)
+                    check_profile.add_message(new_message)
+                check_profile.save_profile(self.new_file_path)
+            elif data is False:
+                messagebox.showerror("Error", "Invalid IP Address")
 
 
     def _draw(self):
