@@ -209,7 +209,8 @@ class MainApp(tk.Frame):
     def list_contacts(self):
         self.body.reset_tree()
         if self.new_file_path:
-            self.check_new()
+            if self.result is True:
+                self.check_new()
             profile = Profile.Profile()
             profile.load_profile(self.new_file_path)
             # print(profile._messages)
@@ -243,7 +244,8 @@ class MainApp(tk.Frame):
         self.body.entry_editor.config(state='normal')
         cur_pos = self.body.entry_editor.yview()[0]
         self.body.entry_editor.delete('1.0', tk.END)
-        self.check_new()
+        if self.result is True:
+            self.check_new()
         profile = Profile.Profile()
         profile.load_profile(self.new_file_path)
         messages = profile._messages
@@ -267,6 +269,7 @@ class MainApp(tk.Frame):
             self.root.after_cancel(self.message_timer_number)
         # make a new after call
         self.body.entry_editor.yview(tk.MOVETO, cur_pos)
+
         self.message_timer_number = self.root.after(250, self.list_contact_messages)
 
     def send_message(self):
@@ -444,6 +447,7 @@ class MainApp(tk.Frame):
         if (edited_ip.isspace() is False) and (edited_ip != "") and (" " not in edited_ip):
             print('Saved IP Address:', edited_ip)
             edited_profile.dsuserver = edited_ip
+            self.result = True
         elif (edited_ip.isspace() is True) or (" " in edited_ip):
             error = True
             error_code += "IP Address Includes Spaces\n"
@@ -479,12 +483,14 @@ class MainApp(tk.Frame):
 
     
     def check_new(self):
+        self.result = True
         if self.new_file_path:
             check_profile = Profile.Profile()
             check_profile.load_profile(self.new_file_path)
             dming = dm.DirectMessenger(check_profile.dsuserver, check_profile.username, check_profile.password)
             data = dming.retrieve_new()
             if data is not False:
+                self.result = True
                 check_profile.save_profile(self.new_file_path)
                 for entry in data:
                     new_message = Profile.Message(entry.message, entry.recipient, entry.timestamp)
@@ -492,8 +498,8 @@ class MainApp(tk.Frame):
                     check_profile.add_message(new_message)
                 check_profile.save_profile(self.new_file_path)
             elif data is False:
-                messagebox.showerror("Error", "Invalid IP Address")
-
+                self.result = False
+                messagebox.showerror("Error", "       Invalid IP Address:\n\nCannot Load New messages")
 
     def _draw(self):
         # Build a menu and add it to the root frame.
@@ -524,9 +530,13 @@ class MainApp(tk.Frame):
     def open_file(self):
         file_path = filedialog.askopenfilename(parent=self.root)
         if file_path:
-            # Do something with the file
-            self.new_file_path = file_path
-            self.list_contacts()
+            try:
+                # Do something with the file
+                self.new_file_path = file_path
+                self.list_contacts()
+            except Profile.DsuFileError:
+                self.new_file_path = None
+                messagebox.showerror("Error", "Not a .dsu File")
 
 
     def new_file_creator(self):
