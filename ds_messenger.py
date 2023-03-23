@@ -61,9 +61,9 @@ class DirectMessenger:
                 print('\tThe server IP Address must be given as a string, bytes or bytearray expected, not an integer, float, None, or boolean\n')
             if type(self.port) != int:
                 print('\tPort number must be given as an integer, not a string, float, None, or boolean\n')
-            if type(username) != str:
+            if type(self.username) != str:
                 print('\tUsername must be given as a string, not an integer, float, None, or boolean\n')
-            if type(password) != str:
+            if type(self.password) != str:
                 print('\tPassword must be given as a string, not an integer, float, None, or boolean\n')
 
             results = False

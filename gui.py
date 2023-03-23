@@ -90,6 +90,7 @@ class Body(tk.Frame):
         message_frame.pack(fill=tk.BOTH, side=tk.TOP, expand=False)
 
         self.message_editor = tk.Text(message_frame, width=0, height=5)
+        # self.message_editor.bind('<Return>', abc())
         self.message_editor.pack(fill=tk.BOTH, side=tk.LEFT,
                                  expand=True, padx=0, pady=0)
 
@@ -104,6 +105,11 @@ class Body(tk.Frame):
         self.entry_editor['yscrollcommand'] = entry_editor_scrollbar.set
         entry_editor_scrollbar.pack(fill=tk.Y, side=tk.LEFT,
                                     expand=False, padx=0, pady=0)
+    
+    '''
+    def abc():
+        print('ENTER')
+    '''
 
 
 class Footer(tk.Frame):
@@ -128,7 +134,7 @@ class Footer(tk.Frame):
         # FIX THIS TO ALLOW THE ENTER BUTTON TO BE PRESSED TO SEND
         # save_button.bind("<Return>", self.send_click)
         # self.body.message_editor.bind("<Return>", lambda event: "break")
-        # self.body.message_editor.bind('<Return>', lambda event: (self.send_click(), "break"))
+        # self.body.message_editor.bind('<Return>', lambda event: (self.send_click, "break"))
         # self.body.message_editor.bind('<Return>', lambda event: save_button.invoke())
 
         self.footer_label = tk.Label(master=self, text="Ready.")
