@@ -71,6 +71,10 @@ class DirectMessenger:
         except socket.gaierror:
             print('\nUnable to connect to the server. Invalid IP Address. Please try again!\n')
             results = False
+        # Connection Lost/No Connection Error
+        except OSError:
+            print('Connection Error: Check internet and/or host connection')
+            results = False
         # This is used to catch an extra errors that may occur
         except:
             # print('Unable to connect to the server. Invalid IP Address or Port Number. Please try again!\n')

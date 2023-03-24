@@ -125,11 +125,12 @@ class Footer(tk.Frame):
             self._send_callback()
 
     def _draw(self):
-        save_button = tk.Button(master=self, text="Send", width=20, command=self.send_click)
+        self.save_button = tk.Button(master=self, text="Send", width=20, command=self.send_click)
+        self.save_button.config(state=tk.DISABLED)
         # You must implement this.
         # Here you must configure the button to bind its click to
         # the send_click() function.
-        save_button.pack(fill=tk.BOTH, side=tk.RIGHT, padx=5, pady=5)
+        self.save_button.pack(fill=tk.BOTH, side=tk.RIGHT, padx=5, pady=5)
 
         # FIX THIS TO ALLOW THE ENTER BUTTON TO BE PRESSED TO SEND
         # save_button.bind("<Return>", self.send_click)
@@ -196,6 +197,7 @@ class MainApp(tk.Frame):
         self.my_os = platform.system()
         self.message_timer_number = None
         self.contact_timer_number = None
+        self.recipient_timer_number = None
         # You must implement this! You must configure and
         # instantiate your DirectMessenger instance after this line.
         #self.direct_messenger = ... continue!
@@ -294,7 +296,7 @@ class MainApp(tk.Frame):
                 profile.add_sent_messages(store_new_message)
                 profile.save_profile(self.new_file_path)
             else:
-                print('ERROR: Could not send message (make GUI error for the future)')
+                messagebox.showerror("Error", "       Connection Error:\n\nCannot Send Messages")
             
 
     def add_contact(self):
@@ -499,7 +501,9 @@ class MainApp(tk.Frame):
                 check_profile.save_profile(self.new_file_path)
             elif data is False:
                 self.result = False
-                messagebox.showerror("Error", "       Invalid IP Address:\n\nCannot Load New messages")
+                # Fix later to give a more precise error, like ip address or connection, and more
+                messagebox.showerror("Error", "       Connection Error:\n\nCannot Load New messages")
+
 
     def _draw(self):
         # Build a menu and add it to the root frame.
@@ -527,6 +531,18 @@ class MainApp(tk.Frame):
         self.footer.pack(fill=tk.BOTH, side=tk.BOTTOM)
 
 
+    def check_recipient_selected(self):
+        if self.recipient:
+            self.footer.save_button.config(state=tk.NORMAL)
+        elif self.recipient is None:
+            self.footer.save_button.config(state=tk.DISABLED)
+
+        if self.recipient_timer_number is not None:
+          self.root.after_cancel(self.recipient_timer_number)
+        # make a new after call
+        self.recipient_timer_number = self.root.after(100, self.check_recipient_selected)
+
+
     def open_file(self):
         file_path = filedialog.askopenfilename(parent=self.root)
         if file_path:
@@ -537,6 +553,10 @@ class MainApp(tk.Frame):
             except Profile.DsuFileError:
                 self.new_file_path = None
                 messagebox.showerror("Error", "Not a .dsu File")
+
+            if (self.new_file_path):
+                self.recipient = None
+                self.check_recipient_selected()
 
 
     def new_file_creator(self):
