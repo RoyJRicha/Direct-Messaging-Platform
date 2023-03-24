@@ -15,6 +15,7 @@ import tkinter as tk
 import time
 import datetime
 import platform
+import socket
 # import subprocess
 from tkinter import ttk, filedialog, messagebox
 # from typing import Text
@@ -50,7 +51,7 @@ class Body(tk.Frame):
         left side in the gui
         """
         try:
-            print(self.posts_tree.selection())
+            # print(self.posts_tree.selection())
             index = int(self.posts_tree.selection()[0])
             self.selection = index
         except IndexError:
@@ -375,6 +376,12 @@ class MainApp(tk.Frame):
         milliseconds to provide a smooth
         refresh time of new content
         """
+        try:
+            socket.create_connection(("8.8.8.8", 53), timeout=5)  # Google DNS server
+            self.result = True
+        except OSError:
+            pass
+
         self.body.entry_editor.config(state='normal')
         cur_pos = self.body.entry_editor.yview()[0]
         self.body.entry_editor.delete('1.0', tk.END)
