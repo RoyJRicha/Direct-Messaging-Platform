@@ -1,3 +1,15 @@
+"""
+Responsible for the Graphical
+User Interface of the messaging
+program. Allowing for many
+features that are intuative
+and easy for the user to use.
+"""
+
+# Roy Richa
+# rricha@uci.edu
+# 51514923
+
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from ttkthemes import ThemedTk
@@ -559,7 +571,7 @@ class MainApp(tk.Frame):
         if self.recipient_timer_number is not None:
           self.root.after_cancel(self.recipient_timer_number)
         # make a new after call
-        self.recipient_timer_number = self.root.after(100, self.check_recipient_selected)
+        self.recipient_timer_number = self.root.after(250, self.check_recipient_selected)
 
 
     def open_file(self):
