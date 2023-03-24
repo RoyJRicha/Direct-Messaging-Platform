@@ -7,6 +7,7 @@ import subprocess
 import Profile as Profile
 import ds_messenger as dm
 import time
+import datetime
 
 
 class Body(tk.Frame):
@@ -41,15 +42,19 @@ class Body(tk.Frame):
             entry = contact[:24] + "..."
         id = self.posts_tree.insert('', id, id, text=contact)
 
-    def insert_user_message(self, message:str):
+    def insert_user_message(self, message:str, timestamp:str):
         self.entry_editor.config(state='normal')
-        self.entry_editor.tag_configure('blue_rounded_edge', foreground='black', background='#0077be', borderwidth=1, relief='ridge', font=('Arial', 10, 'normal'), justify='right')
+        self.entry_editor.tag_configure('blue_rounded_edge_timestamp', foreground='black', background='white', borderwidth=1, relief='ridge', font=('Arial', 8, 'normal'), justify='right')
+        self.entry_editor.insert(1.0, timestamp + '\n', 'blue_rounded_edge_timestamp')
+        self.entry_editor.tag_configure('blue_rounded_edge', foreground='black', background='#0077be', borderwidth=1, relief='ridge', font=('Arial', 11, 'normal'), justify='right')
         self.entry_editor.insert(1.0, message + '\n', 'blue_rounded_edge')
         self.entry_editor.config(state='disabled')
 
-    def insert_contact_message(self, message:str):
+    def insert_contact_message(self, message:str, timestamp:str):
         self.entry_editor.config(state='normal')
-        self.entry_editor.tag_configure('green_rounded_edge', foreground='black', background='#85c8a3', borderwidth=1, relief='ridge', font=('Arial', 10, 'normal'), justify='left')
+        self.entry_editor.tag_configure('green_rounded_edge_timestamp', foreground='black', background='white', borderwidth=1, relief='ridge', font=('Arial', 8, 'normal'), justify='left')
+        self.entry_editor.insert(1.0, timestamp + '\n', 'green_rounded_edge_timestamp')
+        self.entry_editor.tag_configure('green_rounded_edge', foreground='black', background='#85c8a3', borderwidth=1, relief='ridge', font=('Arial', 11, 'normal'), justify='left')
         self.entry_editor.insert(1.0, message + '\n', 'green_rounded_edge')
         self.entry_editor.config(state='disabled')
 
@@ -246,25 +251,28 @@ class MainApp(tk.Frame):
         self.body.entry_editor.config(state='normal')
         cur_pos = self.body.entry_editor.yview()[0]
         self.body.entry_editor.delete('1.0', tk.END)
-        if self.result is True:
-            self.check_new()
-        profile = Profile.Profile()
-        profile.load_profile(self.new_file_path)
-        messages = profile._messages
-        sent_messages = profile._sent_messages
-        all_messages_lst = []
-        for entry in messages:
-            if self.recipient == entry['author']:
-                all_messages_lst.append(entry)
-        for sent in sent_messages:
-            if self.recipient == sent['recipient']:
-                all_messages_lst.append(sent)
-        sorted_message_lst = sorted(all_messages_lst, key=lambda x: float(x["timestamp"]), reverse=True)
-        for dm in sorted_message_lst:
-            if "author" in dm:
-                self.body.insert_contact_message(dm['message'])
-            elif "recipient" in dm:
-                self.body.insert_user_message(dm['message'])
+        if self.new_file_path:
+            if self.result is True:
+                self.check_new()
+            profile = Profile.Profile()
+            profile.load_profile(self.new_file_path)
+            messages = profile._messages
+            sent_messages = profile._sent_messages
+            all_messages_lst = []
+            for entry in messages:
+                if self.recipient == entry['author']:
+                    all_messages_lst.append(entry)
+            for sent in sent_messages:
+                if self.recipient == sent['recipient']:
+                    all_messages_lst.append(sent)
+            sorted_message_lst = sorted(all_messages_lst, key=lambda x: float(x["timestamp"]), reverse=True)
+            for dm in sorted_message_lst:
+                if "author" in dm:
+                    time = datetime.datetime.fromtimestamp(float(dm['timestamp'])).strftime("%d/%m/%Y %I:%M %p")
+                    self.body.insert_contact_message(dm['message'], time)
+                elif "recipient" in dm:
+                    time = datetime.datetime.fromtimestamp(float(dm['timestamp'])).strftime("%d/%m/%Y %I:%M %p")
+                    self.body.insert_user_message(dm['message'], time)
         self.body.entry_editor.config(state='disabled')
         # cancel the previous after call, if it exists
         if self.message_timer_number is not None:
