@@ -104,7 +104,7 @@ class DirectMessenger:
             if user_extraction.response['type'] == 'ok':
                 self.token = user_extraction.token
 
-        print(type(c_socket))
+        # print(type(c_socket))
 
         return results, c_socket
 
@@ -122,7 +122,7 @@ class DirectMessenger:
                 try:
                     c_socket.sendall(data.encode())
                     received_data = c_socket.recv(4096).decode()
-                    print("Received data:", received_data)
+                    # print("Received data:", received_data)
                     received_data_dict = json.loads(received_data)
                     print()
                     print(received_data_dict['response']['messages'])
