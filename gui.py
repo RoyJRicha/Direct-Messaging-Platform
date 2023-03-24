@@ -11,23 +11,32 @@ and easy for the user to use.
 # 51514923
 
 import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
-from ttkthemes import ThemedTk
-from typing import Text
-import os
-import platform
-import subprocess
-import Profile as Profile
-import ds_messenger as dm
+# import os
 import time
 import datetime
+import platform
+# import subprocess
+from tkinter import ttk, filedialog, messagebox
+# from typing import Text
+from ttkthemes import ThemedTk
+import Profile as Profile
+import ds_messenger as dm
+
 
 
 class Body(tk.Frame):
+    """
+    Resoponsible for creating the body of the gui
+    """
     def __init__(self, root, recipient_selected_callback=None):
+        """
+        Initialization of variables and callbacks that 
+        are to be used within the program and gui
+        """
         tk.Frame.__init__(self, root)
         self.root = root
         self._contacts = [str]
+        self.selection = None
         self._select_callback = recipient_selected_callback
         # After all initialization is complete,
         # call the _draw method to pack the widgets
@@ -35,6 +44,11 @@ class Body(tk.Frame):
         self._draw()
 
     def node_select(self, event):
+        """
+        Responsible for communicating the
+        selected contact in the tree on the
+        left side in the gui
+        """
         try:
             print(self.posts_tree.selection())
             index = int(self.posts_tree.selection()[0])
@@ -44,25 +58,39 @@ class Body(tk.Frame):
         entry = self._contacts[index]
         if self._select_callback is not None:
             self._select_callback(entry)
-        #except IndexError:
-            #pass
-        
+        # except IndexError:
+            # pass
 
     def reset_tree(self):
+        """
+        Resets the tree
+        """
         self.posts_tree.delete(*self.posts_tree.get_children())
 
-
     def insert_contact(self, contact: str):
+        """
+        Inserts a contact into the
+        treeview widget
+        """
         self._contacts.append(contact)
         id = len(self._contacts) - 1
         self._insert_contact_tree(id, contact)
 
     def _insert_contact_tree(self, id, contact: str):
+        """
+        Actually makes the tree of contacts
+        in the treeview widget under posts_tree
+        """
         if len(contact) > 25:
             entry = contact[:24] + "..."
         id = self.posts_tree.insert('', id, id, text=contact)
 
-    def insert_user_message(self, message:str, timestamp:str):
+    def insert_user_message(self, message: str, timestamp: str):
+        """
+        Responsible for inserting the messages
+        that the user sends themselves into
+        the the entry editor widget
+        """
         self.entry_editor.config(state='normal')
         self.entry_editor.tag_configure('blue_rounded_edge_timestamp', foreground='black', background='white', borderwidth=1, relief='ridge', font=('Arial', 8, 'normal'), justify='right')
         self.entry_editor.insert(1.0, timestamp + '\n', 'blue_rounded_edge_timestamp')
@@ -70,7 +98,12 @@ class Body(tk.Frame):
         self.entry_editor.insert(1.0, message + '\n', 'blue_rounded_edge')
         self.entry_editor.config(state='disabled')
 
-    def insert_contact_message(self, message:str, timestamp:str):
+    def insert_contact_message(self, message: str, timestamp: str):
+        """
+        Responsible for inserting the messages
+        that the user recieves into
+        the the entry editor widget
+        """
         self.entry_editor.config(state='normal')
         self.entry_editor.tag_configure('green_rounded_edge_timestamp', foreground='black', background='white', borderwidth=1, relief='ridge', font=('Arial', 8, 'normal'), justify='left')
         self.entry_editor.insert(1.0, timestamp + '\n', 'green_rounded_edge_timestamp')
@@ -78,22 +111,31 @@ class Body(tk.Frame):
         self.entry_editor.insert(1.0, message + '\n', 'green_rounded_edge')
         self.entry_editor.config(state='disabled')
 
-    '''
-    import datetime
-    import time
-
-    time = datetime.datetime.fromtimestamp(time.time()).strftime("%d/%m/%Y %I:%M %p")
-
-    print(time)
-    '''
-
     def get_text_entry(self) -> str:
+        """
+        Responsible for retrieving
+        the text that a user enters
+        in the text box before pressing
+        Send
+        """
         return self.message_editor.get('1.0', tk.END).strip()
 
     def set_text_entry(self):
+        """
+        Responsible for resetting
+        the text entry after the user
+        presses Send
+        """
         self.message_editor.delete(1.0, tk.END)
 
     def _draw(self):
+        """
+        This is responsible for
+        drawing out and making the actual
+        widgets for the gui. This creates the
+        frame, the treeview, the entry frame,
+        editory entry, and message frame
+        """
         posts_frame = tk.Frame(master=self, width=250)
         posts_frame.pack(fill=tk.BOTH, side=tk.LEFT)
 
@@ -119,7 +161,8 @@ class Body(tk.Frame):
         self.message_editor.pack(fill=tk.BOTH, side=tk.LEFT,
                                  expand=True, padx=0, pady=0)
 
-        self.entry_editor = tk.Text(editor_frame, width=0, height=5, state="disabled")
+        self.entry_editor = tk.Text(editor_frame, width=0,
+                                    height=5, state="disabled")
         self.entry_editor.tag_configure('entry-right', justify='right')
         self.entry_editor.tag_configure('entry-left', justify='left')
         self.entry_editor.pack(fill=tk.BOTH, side=tk.LEFT,
@@ -130,15 +173,21 @@ class Body(tk.Frame):
         self.entry_editor['yscrollcommand'] = entry_editor_scrollbar.set
         entry_editor_scrollbar.pack(fill=tk.Y, side=tk.LEFT,
                                     expand=False, padx=0, pady=0)
-    
-    '''
-    def abc():
-        print('ENTER')
-    '''
 
 
 class Footer(tk.Frame):
+    """
+    This class is responsible for creating
+    the footer of the gui, this is where it
+    shows Ready if the interface is ready to
+    use as well as having the send button
+    for the user to send a message
+    """
     def __init__(self, root, send_callback=None):
+        """
+        Initialization of variables
+        to be used in the Footer class
+        """
         tk.Frame.__init__(self, root)
         self.root = root
         self._send_callback = send_callback
@@ -146,10 +195,21 @@ class Footer(tk.Frame):
         self._draw()
 
     def send_click(self):
+        """
+        Sends the actions when Send button
+        is pressed to a callback to then
+        perform the actions of pressing
+        the send button
+        """
         if self._send_callback is not None:
             self._send_callback()
 
     def _draw(self):
+        """
+        This actually draws the
+        send button so it is visible
+        in the gui
+        """
         self.save_button = tk.Button(master=self, text="Send", width=20, command=self.send_click)
         self.save_button.config(state=tk.DISABLED)
         # You must implement this.
@@ -166,11 +226,19 @@ class Footer(tk.Frame):
         self.footer_label = tk.Label(master=self, text=f"Ready.")
         self.footer_label.pack(fill=tk.BOTH, side=tk.LEFT, padx=5)
 
-        #self.body.get_text_entry.bind("<Return>", lambda event: self.send_click())
+        # self.body.get_text_entry.bind("<Return>", lambda event: self.send_click())
 
 
 class NewContactDialog(tk.simpledialog.Dialog):
+    """
+    Class responsible for allowing
+    edits to the users profile
+    """
     def __init__(self, root, title=None, user=None, pwd=None, server=None):
+        """
+        Initialization of variables in the
+        NewContactDialog class
+        """
         self.root = root
         self.server = server
         self.user = user
@@ -178,6 +246,9 @@ class NewContactDialog(tk.simpledialog.Dialog):
         super().__init__(root, title)
 
     def body(self, frame):
+        """
+        Generates the body for the class
+        """
         self.server_label = tk.Label(frame, width=30, text="DS Server Address")
         self.server_label.pack()
         self.server_entry = tk.Entry(frame, width=30)
@@ -195,7 +266,7 @@ class NewContactDialog(tk.simpledialog.Dialog):
         # but you will want to add self.password_entry['show'] = '*'
         # such that when the user types, the only thing that appears are
         # * symbols.
-        #self.password...
+        # self.password...
 
         self.password_label = tk.Label(frame, width=30, text="Password")
         self.password_label.pack()
@@ -203,15 +274,32 @@ class NewContactDialog(tk.simpledialog.Dialog):
         self.password_entry.insert(tk.END, self.user)
         self.password_entry.pack()
 
-
     def apply(self):
+        """
+        Gets entries from the user
+        """
         self.user = self.username_entry.get()
         self.pwd = self.password_entry.get()
         self.server = self.server_entry.get()
 
 
 class MainApp(tk.Frame):
+    """
+    This class is responsible for most
+    if not all actions done on the gui.
+    This ranges from the user loading a file,
+    creating a new file, editing a contact,
+    addint a contact, sending a message, loading
+    old messages, and for the refreshing of
+    the profile to recieve new messages as they
+    come
+    """
     def __init__(self, root):
+        """
+        Initialization of all necessary
+        variables and objects needed for
+        the MainApp
+        """
         tk.Frame.__init__(self, root)
         self.root = root
         self.username = None
@@ -219,21 +307,31 @@ class MainApp(tk.Frame):
         self.server = None
         self.recipient = None
         self.new_file_path = None
+        self.result = None
         self.my_os = platform.system()
         self.message_timer_number = None
         self.contact_timer_number = None
         self.recipient_timer_number = None
-        # You must implement this! You must configure and
-        # instantiate your DirectMessenger instance after this line.
-        #self.direct_messenger = ... continue!
+        self.contact_window = None
+        self.new_contact_entry = None
+        self.edit_window = None
+        self.user_entry = None
+        self.pass_entry = None
+        self.new_username_entry = None
+        self.new_password_entry = None
+        self.new_bio_entry = None
+        self.new_ip_entry = None
+        self.profile_window = None
 
-        # After all initialization is complete,
-        # call the _draw method to pack the widgets
-        # into the root frame
         self._draw()
 
-
     def list_contacts(self):
+        """
+        Responsible for listing contacts,
+        this updates the treeview each time
+        a new contact sends a message to the
+        user
+        """
         self.body.reset_tree()
         if self.new_file_path:
             if self.result is True:
@@ -249,10 +347,10 @@ class MainApp(tk.Frame):
 
         # SUPPOSED TO BE ABLE REFRESH THE CONTACTS LIST, NOT WORKING FIX
         if self.contact_timer_number is not None:
-          self.root.after_cancel(self.contact_timer_number)
+            self.root.after_cancel(self.contact_timer_number)
         # make a new after call
         self.contact_timer_number = self.root.after(2000, self.list_contacts)
-    
+
     # FIX THIS
     '''
     def list_new_contacts(self):
@@ -268,6 +366,15 @@ class MainApp(tk.Frame):
     '''
 
     def list_contact_messages(self):
+        """
+        This is responsible for listing
+        and refreshing all, new and old,
+        messages from the user that have been
+        or are being recieved. This refreshes
+        at all times at a rate of 250
+        milliseconds to provide a smooth
+        refresh time of new content
+        """
         self.body.entry_editor.config(state='normal')
         cur_pos = self.body.entry_editor.yview()[0]
         self.body.entry_editor.delete('1.0', tk.END)
@@ -303,7 +410,12 @@ class MainApp(tk.Frame):
         self.message_timer_number = self.root.after(250, self.list_contact_messages)
 
     def send_message(self):
-        # You must implement this
+        """
+        This is responsible for the commands
+        after the Send button is pressed. First,
+        actually sending the message, then storing
+        that sent message into the users profile
+        """
         text = self.body.get_text_entry()
         print('Message', text)
         self.body.set_text_entry()
@@ -325,9 +437,17 @@ class MainApp(tk.Frame):
                 profile.save_profile(self.new_file_path)
             else:
                 messagebox.showerror("Error", "       Connection Error:\n\nCannot Send Messages")
-            
 
     def add_contact(self):
+        """
+        Responsible for the add Contact
+        button where it will first prompt
+        a new window asking the user for
+        a new contact they would like to add.
+        After they press save, it will save
+        the contact in their profile, and
+        load it to the list of contacts
+        """
         if self.new_file_path:
             self.contact_window = tk.Toplevel(self.root)
             self.contact_window.title("Add Contact")
@@ -354,6 +474,12 @@ class MainApp(tk.Frame):
             messagebox.showerror("Error", "Load File Before Adding Contacts")
 
     def new_contact_saver(self):
+        """
+        Responsible for communicating
+        with the new contact method to
+        actually save the contact
+        to the users profile
+        """
         new_contact = self.new_contact_entry.get()
         print('TYPE', new_contact)
 
@@ -365,12 +491,20 @@ class MainApp(tk.Frame):
 
         self.contact_window.destroy()
 
-
     def cancel_window_2(self):
+        """
+        Responsible for closing out
+        the add contact window
+        """
         self.contact_window.destroy()
 
-
     def recipient_selected(self, recipient):
+        """
+        Responsible for knowing and
+        communicating the current recipient
+        or contact selected so the proper
+        messages, new and old, can be loaded
+        """
         self.body.entry_editor.config(state='normal')
         self.body.entry_editor.delete('1.0', tk.END)
         self.recipient = recipient
@@ -378,8 +512,15 @@ class MainApp(tk.Frame):
         self.list_contact_messages()
         self.body.entry_editor.config(state='disabled')
 
-
     def configure_server(self):
+        """
+        This is the main function in this
+        class that allows for the displaying
+        of all proper frames, buttons, and anything
+        else needed to navigate the main window
+        of the gui
+        """
+
         '''
         ud = NewContactDialog(self.root, "Configure Account",
                               self.username, self.password, self.server)
@@ -435,7 +576,6 @@ class MainApp(tk.Frame):
             else:
                 pass_entry.configure(state="normal")
             '''
-            
 
             tk.Button(self.edit_window, text="Save", command=self.edit_saver, bg="#A6E6EE").grid(row=10, column=0, columnspan=2)
             tk.Button(self.edit_window, text="Cancel", command=self.cancel_window_3, bg="#EC9898").grid(row=10, column=1, columnspan=2)
@@ -453,6 +593,10 @@ class MainApp(tk.Frame):
     '''
 
     def username_entry_change(self, event):
+        """
+        Responsible for recognnising whether the
+        username was changed
+        """
         if len(self.user_entry.get().strip()) > 0:
             self.pass_entry.configure(state="normal")
         else:
@@ -460,6 +604,14 @@ class MainApp(tk.Frame):
             self.pass_entry.configure(state="disabled")
 
     def edit_saver(self):
+        """
+        This is responsible for prompting
+        a new window if an error occurs
+        while a user is trying to save
+        their new biometrics. It also gets the
+        entries from the user to save in
+        the profile if no errors occur
+        """
         edited_username = self.new_username_entry.get()
         edited_password = self.new_password_entry.get()
         edited_ip = self.new_ip_entry.get()
@@ -469,7 +621,6 @@ class MainApp(tk.Frame):
         print('IP Address:', edited_ip)
         print('Username:', edited_username)
         print('Password', edited_password)
-
 
         edited_profile = Profile.Profile()
         edited_profile.load_profile(self.new_file_path)
@@ -493,26 +644,35 @@ class MainApp(tk.Frame):
         elif (edited_password.isspace() is True) or (" " in edited_password):
             error = True
             error_code += "Password Includes Spaces\n"
-        
+
         if error is True:
             messagebox.showerror("Error", error_code)
         else:
             edited_profile.save_profile(self.new_file_path)
             self.edit_window.destroy()
 
-        
-
-
     def cancel_window_3(self):
+        """
+        Responsible for closing
+        the edit profile window
+        """
         self.edit_window.destroy()
 
-
-    def publish(self, message:str):
+    def publish(self, message: str):
+        """
+        Not sure what this is for
+        for a5, will most likely delete
+        """
         # You must implement this!
         pass
 
-    
     def check_new(self):
+        """
+        This is a huge part of the program
+        and is responsible for checking for
+        new messages or recipients that
+        contact the user
+        """
         self.result = True
         if self.new_file_path:
             check_profile = Profile.Profile()
@@ -532,8 +692,15 @@ class MainApp(tk.Frame):
                 # Fix later to give a more precise error, like ip address or connection, and more
                 messagebox.showerror("Error", "       Connection Error:\n\nCannot Load New messages")
 
-
     def _draw(self):
+        """
+        This actually draws the main
+        menu bar including the File
+        and Settings tabs that include
+        the New, Open, Close as well as
+        the Add Contact or Configure
+        DS Server
+        """
         # Build a menu and add it to the root frame.
         menu_bar = tk.Menu(self.root)
         self.root['menu'] = menu_bar
@@ -558,23 +725,33 @@ class MainApp(tk.Frame):
         self.footer = Footer(self.root, send_callback=self.send_message)
         self.footer.pack(fill=tk.BOTH, side=tk.BOTTOM)
 
-
     def close_gui(self):
+        """
+        Responsible for closing
+        the main window if 'Close'
+        is selected"""
         main.destroy()
 
     def check_recipient_selected(self):
+        """
+        This checks if a recipient from
+        the treeview has been selected
+        """
         if self.recipient:
             self.footer.save_button.config(state=tk.NORMAL)
         elif self.recipient is None:
             self.footer.save_button.config(state=tk.DISABLED)
 
         if self.recipient_timer_number is not None:
-          self.root.after_cancel(self.recipient_timer_number)
+            self.root.after_cancel(self.recipient_timer_number)
         # make a new after call
         self.recipient_timer_number = self.root.after(250, self.check_recipient_selected)
 
-
     def open_file(self):
+        """
+        Allows for the user to open/load
+        a file from their machine
+        """
         file_path = filedialog.askopenfilename(parent=self.root)
         if file_path:
             try:
@@ -589,8 +766,11 @@ class MainApp(tk.Frame):
                 self.recipient = None
                 self.check_recipient_selected()
 
-
     def new_file_creator(self):
+        """
+        Allows for the user to create a new file
+        on their machine
+        """
         # Open a dialog box to get the filename and location
         file_path = filedialog.asksaveasfilename(defaultextension=".dsu", filetypes=[('DSU files', '.dsu')])
         # Check if a filename was entered
@@ -608,8 +788,12 @@ class MainApp(tk.Frame):
             # Calls the function to open a new window to save profile info
             self.biometrics_window()
 
-
     def biometrics_window(self):
+        """
+        Responsible for grabbing the username,
+        password, bio, and ip address for when
+        a user creates a new profile
+        """
         # Create a new window to prompt for user info
         self.profile_window = tk.Toplevel(self.root)
         self.profile_window.title("Create Profile")
@@ -621,7 +805,7 @@ class MainApp(tk.Frame):
 
         # Add Titles, Labels, Entries, and Buttons to the new window
         title = tk.Label(self.profile_window, text="Create Your Profile", font=("Impact", 16))
-        #title.place(relx=0.5, rely=0.0, anchor="center")
+        # title.place(relx=0.5, rely=0.0, anchor="center")
         title.grid(row=0, column=1)
 
         tk.Label(self.profile_window, text="Username", font=("Verdana", 10)).grid(row=2, column=0)
@@ -649,8 +833,12 @@ class MainApp(tk.Frame):
         self.new_bio_entry = bio_entry
         self.new_ip_entry = ip_entry
 
-
     def biomentrics_saver(self):
+        """
+        Responsible for saving the contents
+        that the user enters in the Create
+        Profile window
+        """
         # Create the new file
         open(self.new_file_path, 'a').close()
 
@@ -671,8 +859,11 @@ class MainApp(tk.Frame):
         # Close the user info window
         self.profile_window.destroy()
         self.list_contacts()
-    
+
     def cancel_window(self):
+        """Responsible for closing the
+        Create Profile Window
+        """
         self.profile_window.destroy()
 
 
