@@ -1,6 +1,4 @@
 import unittest
-from ds_messenger import DirectMessenger, DirectMessage
+from ds_messenger import DirectMessage, DirectMessenger
 
-
-class TestDSMessenger(unittest.TestCase):
-    
+class TestDirectMessage(unittest.TestCase):

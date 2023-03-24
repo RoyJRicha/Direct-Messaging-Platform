@@ -39,27 +39,6 @@ def join_usr_pwd(username, password):
     return json_string
 
 
-def post(post, token):
-    post = '"' + post + '"'
-    token = '"' + token + '"'
-    timestamp = ''
-    json_string = '{"token":{user_token}, "post": {"entry": {post}, "timestamp": "1603167689.3928561"}}'
-    json_string = json_string.replace('{user_token}', token)
-    json_string = json_string.replace('{post}', post)
-
-    return json_string
-
-
-def bio_post(bio, token):
-    bio = '"' + bio + '"'
-    token = '"' + token + '"'
-    json_string = '{"token":{token}, "bio": {"entry": {bio}, "timestamp": "1603167689.3928561"}}'
-    json_string = json_string.replace('{bio}', bio)
-    json_string = json_string.replace('{token}', token)
-
-    return json_string
-
-
 def send_dm(message, username, token):
     username = '"' + username + '"'
     message = '"' + message + '"'
