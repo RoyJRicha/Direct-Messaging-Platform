@@ -104,6 +104,8 @@ class DirectMessenger:
             if user_extraction.response['type'] == 'ok':
                 self.token = user_extraction.token
 
+        print(type(c_socket))
+
         return results, c_socket
 
 
@@ -120,6 +122,7 @@ class DirectMessenger:
                 try:
                     c_socket.sendall(data.encode())
                     received_data = c_socket.recv(4096).decode()
+                    print("Received data:", received_data)
                     received_data_dict = json.loads(received_data)
                     print()
                     print(received_data_dict['response']['messages'])
@@ -130,6 +133,7 @@ class DirectMessenger:
                         results = False
                 # This will return a statement if program wasn't able to access user or pass
                 except Exception as e:
+                    traceback.print_exc()
                     print('Could not access/send message and recipient or connect to the server:', e)
                     results = False
 
