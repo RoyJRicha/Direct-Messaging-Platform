@@ -19,3 +19,20 @@ class TestDirectMessenger(unittest.TestCase):
         self.assertEqual(self.dm.password, "testpassword")
         self.assertEqual(self.dm.dsuserver, "168.235.86.101")
         self.assertEqual(self.dm.port, 3021)
+
+    def test_send(self):
+        result = self.dm.send("Hello, World!", "TestRecipient")
+        self.assertTrue(result)
+
+    def test_retrieve_new(self):
+        result = self.dm.retrieve_new()
+        self.assertIsInstance(result, list)
+
+    def test_retrieve_all(self):
+        result = self.dm.retrieve_all()
+        self.assertIsInstance(result, list)
+
+'''
+if __name__ == '__main__':
+    unittest.main()
+'''
