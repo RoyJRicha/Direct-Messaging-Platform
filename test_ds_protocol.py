@@ -25,6 +25,29 @@ class TestDsProtocol(unittest.TestCase):
         self.assertEqual(json_obj["join"]["password"], password)
         self.assertEqual(json_obj["join"]["token"], "")
 
+    def test_send_dm(self):
+        message = "Random Test Message"
+        username = "RandomUsername1234"
+        token = "41476543.89283928"
+        json_string = dp.send_dm(message, username, token)
+        json_obj = json.loads(json_string)
+        self.assertEqual(json_obj['token'], token)
+        self.assertEqual(json_obj['directmessage']['entry'], message)
+        self.assertEqual(json_obj['directmessage']['recipient'], username)
+
+    def test_unread_dms(self):
+        token = "41476543.89283928"
+        json_string = dp.unread_dms(token)
+        json_obj = json.loads(json_string)
+        self.assertEqual(json_obj['token'], token)
+        self.assertEqual(json_obj['directmessage'], 'new')
+
+    def test_all_dms(self):
+        token = "41476543.89283928"
+        json_string = dp.all_dms(token)
+        json_obj = json.loads(json_string)
+        self.assertEqual(json_obj['token'], token)
+        self.assertEqual(json_obj['directmessage'], 'all')
 
 '''
 if __name__ == '__main__':
