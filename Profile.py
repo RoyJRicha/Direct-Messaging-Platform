@@ -139,13 +139,14 @@ class Sent(dict):
         """
         Variable instantiation
         """
-        self._time = timestamp
+        self._timestamp = timestamp
         self.add_message(message)
         self.add_recipient(recipient)
 
         # Subclass dict to expose Post properties for serialization
         # Don't worry about this!
-        dict.__init__(self, message=self._message, recipient=self._recipient, timestamp=self._time)
+        dict.__init__(self, message=self._message,
+                       recipient=self._recipient, timestamp=self._timestamp)
 
     def add_message(self, message):
         """
