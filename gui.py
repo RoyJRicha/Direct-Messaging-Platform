@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
+from ttkthemes import ThemedTk
 from typing import Text
 import os
 import platform
@@ -22,11 +23,18 @@ class Body(tk.Frame):
         self._draw()
 
     def node_select(self, event):
-        index = int(self.posts_tree.selection()[0])
+        try:
+            print(self.posts_tree.selection())
+            index = int(self.posts_tree.selection()[0])
+            self.selection = index
+        except IndexError:
+            index = self.selection
         entry = self._contacts[index]
         if self._select_callback is not None:
             self._select_callback(entry)
-
+        #except IndexError:
+            #pass
+        
 
     def reset_tree(self):
         self.posts_tree.delete(*self.posts_tree.get_children())
@@ -46,7 +54,7 @@ class Body(tk.Frame):
         self.entry_editor.config(state='normal')
         self.entry_editor.tag_configure('blue_rounded_edge_timestamp', foreground='black', background='white', borderwidth=1, relief='ridge', font=('Arial', 8, 'normal'), justify='right')
         self.entry_editor.insert(1.0, timestamp + '\n', 'blue_rounded_edge_timestamp')
-        self.entry_editor.tag_configure('blue_rounded_edge', foreground='black', background='#0077be', borderwidth=1, relief='ridge', font=('Arial', 11, 'normal'), justify='right')
+        self.entry_editor.tag_configure('blue_rounded_edge', foreground='black', background='#00D6EF', borderwidth=1, relief='ridge', font=('Arial', 11, 'normal'), justify='right')
         self.entry_editor.insert(1.0, message + '\n', 'blue_rounded_edge')
         self.entry_editor.config(state='disabled')
 
@@ -54,7 +62,7 @@ class Body(tk.Frame):
         self.entry_editor.config(state='normal')
         self.entry_editor.tag_configure('green_rounded_edge_timestamp', foreground='black', background='white', borderwidth=1, relief='ridge', font=('Arial', 8, 'normal'), justify='left')
         self.entry_editor.insert(1.0, timestamp + '\n', 'green_rounded_edge_timestamp')
-        self.entry_editor.tag_configure('green_rounded_edge', foreground='black', background='#85c8a3', borderwidth=1, relief='ridge', font=('Arial', 11, 'normal'), justify='left')
+        self.entry_editor.tag_configure('green_rounded_edge', foreground='black', background='#A4FF9A', borderwidth=1, relief='ridge', font=('Arial', 11, 'normal'), justify='left')
         self.entry_editor.insert(1.0, message + '\n', 'green_rounded_edge')
         self.entry_editor.config(state='disabled')
 
@@ -143,7 +151,7 @@ class Footer(tk.Frame):
         # self.body.message_editor.bind('<Return>', lambda event: (self.send_click, "break"))
         # self.body.message_editor.bind('<Return>', lambda event: save_button.invoke())
 
-        self.footer_label = tk.Label(master=self, text="Ready.")
+        self.footer_label = tk.Label(master=self, text=f"Ready.")
         self.footer_label.pack(fill=tk.BOTH, side=tk.LEFT, padx=5)
 
         #self.body.get_text_entry.bind("<Return>", lambda event: self.send_click())
@@ -522,7 +530,7 @@ class MainApp(tk.Frame):
         menu_bar.add_cascade(menu=menu_file, label='File')
         menu_file.add_command(label='New', command=self.new_file_creator)
         menu_file.add_command(label='Open...', command=self.open_file)
-        menu_file.add_command(label='Close')
+        menu_file.add_command(label='Close', command=self.close_gui)
 
         settings_file = tk.Menu(menu_bar)
         menu_bar.add_cascade(menu=settings_file, label='Settings')
@@ -538,6 +546,9 @@ class MainApp(tk.Frame):
         self.footer = Footer(self.root, send_callback=self.send_message)
         self.footer.pack(fill=tk.BOTH, side=tk.BOTTOM)
 
+
+    def close_gui(self):
+        main.destroy()
 
     def check_recipient_selected(self):
         if self.recipient:
@@ -655,10 +666,10 @@ class MainApp(tk.Frame):
 
 if __name__ == "__main__":
     # All Tkinter programs start with a root window. We will name ours 'main'.
-    main = tk.Tk()
+    main = ThemedTk(theme="adapta")
 
     # 'title' assigns a text value to the Title Bar area of a window.
-    main.title("ICS 32 Distributed Social Messenger")
+    main.title("The Ultimate Messaging App (Better than Discord)")
 
     # This is just an arbitrary starting point. You can change the value
     # around to see how the starting size of the window changes.
