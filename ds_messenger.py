@@ -1,28 +1,70 @@
+"""
+ds_messenger.py is responsible
+for the connection and retrieval of
+information from the local server on
+port 3021. The Classes allow for the
+retrieval of tokens, sent messages,
+recieved messages, and the saving
+of DirectMessage in a list of objects
+of that class
+"""
 import socket
 import json
-import ast
 import traceback
 import ds_protocol as dp
 
 
 class DirectMessage:
+    """
+    This class is called
+    to allow for the saving
+    of messages in a single
+    object so that they can be
+    accessed easier outside
+    this class
+    """
     def __init__(self):
+        """
+        Institialization of the variables
+        that are needed for this class
+        """
         self.recipient = None
         self.message = None
         self.timestamp = None
 
 
 class DirectMessenger:
+    """
+    DirectMessenger is responsible for the
+    retrieval of tokens, sending messages, and
+    the retrieval of new and all messages for
+    a specific profile taking in an IP address, 
+    username, and password
+    """
     def __init__(self, dsuserver=None, username=None, password=None):
+        """
+        Initialization of all variables,
+        including the port, that are needed
+        for all functions in the Class to
+        work together and function properly
+        """
         self.token = None
         self.username = username
         self.password = password
         self.dsuserver = dsuserver
         self.port = 3021
 
-    
     def retrieve_token(self):
-
+        """
+        This function is used for the sole
+        purpose of retrieve the token from the
+        server and setting it if and only if
+        there was no error from the server
+        as it requested the token. It also
+        returns T/F depending on status of
+        connection as well as the socket,
+        if it was obtained
+        """
         results = True
         c_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -57,13 +99,13 @@ class DirectMessenger:
         # Checks in case the hard coded function call has incorrect types passed in
         except TypeError:
             print('\nFailed to connect to the server likely due to the following error(s): \n')
-            if type(self.dsuserver) != str:
+            if isinstance(self.dsuserver) != str:
                 print('\tThe server IP Address must be given as a string, bytes or bytearray expected, not an integer, float, None, or boolean\n')
-            if type(self.port) != int:
+            if isinstance(self.port) != int:
                 print('\tPort number must be given as an integer, not a string, float, None, or boolean\n')
-            if type(self.username) != str:
+            if isinstance(self.username) != str:
                 print('\tUsername must be given as a string, not an integer, float, None, or boolean\n')
-            if type(self.password) != str:
+            if isinstance(self.password) != str:
                 print('\tPassword must be given as a string, not an integer, float, None, or boolean\n')
 
             results = False
@@ -76,13 +118,12 @@ class DirectMessenger:
             print('Connection Error: Check internet and/or host connection')
             results = False
         # This is used to catch an extra errors that may occur
-        except:
+        except Exception as error:
             # print('Unable to connect to the server. Invalid IP Address or Port Number. Please try again!\n')
-            traceback.print_exc()
-            print('\nAn Error has occured, please try again!\n')
+            # traceback.print_exc()
+            print('\nAn Error has occured, please try again:', error)
             results = False
 
-        
         # Extracting the data from user input
         if results is True:
             try:
@@ -96,20 +137,29 @@ class DirectMessenger:
                 print(received_data_dict['response']['message'])
                 print()
                 results = False
+            except Exception as error:
+                print('Error has occured:', error)
         else:
             pass
 
-        
         if results is True:
             if user_extraction.response['type'] == 'ok':
                 self.token = user_extraction.token
 
-        # print(type(c_socket))
-
         return results, c_socket
 
-
     def retrieve_dms(self, category):
+        """
+        Simply put, this is both the retrieve all
+        and retrieve new functions essentially put
+        and condenced to one class. When the functions
+        are called independently, they pass in either
+        'new' or 'all' to this function to determine
+        what to grab. This was done because the
+        functions were essentially identical with
+        the only difference being dp.unread_dms
+        or dp.all_dms
+        """
         results, c_socket = self.retrieve_token()
 
         if results is True:
@@ -132,15 +182,15 @@ class DirectMessenger:
                     if received_data_dict['response']['type'] == 'error':
                         results = False
                 # This will return a statement if program wasn't able to access user or pass
-                except Exception as e:
+                except Exception as error:
                     traceback.print_exc()
-                    print('Could not access/send message and recipient or connect to the server:', e)
+                    print('Could not access/send message and recipient or connect to the server:', error)
                     results = False
 
-            except Exception as e:
-                print("An error occurred:", e)
+            except Exception as error:
+                print("An error occurred:", error)
                 results = False
-            
+
         if results is True:
             for element in dms_dict:
                 message_class = DirectMessage()
@@ -150,14 +200,20 @@ class DirectMessenger:
 
                 new_dms.append(message_class)
 
-        
         if results is False:
             return results
-        else:
-            return new_dms
 
+        return new_dms
 
-    def send(self, message:str, recipient:str) -> bool:
+    def send(self, message: str, recipient: str) -> bool:
+        """
+        Responsible for actually sending
+        the requested message to the server
+        and therefor the recipient. The function
+        takes message and recipient as parameters
+        and sneds the message to the requested
+        recipient
+        """
         # must return true if message successfully sent, false if send failed.
         results, c_socket = self.retrieve_token()
         print(recipient)
@@ -176,19 +232,19 @@ class DirectMessenger:
                     if received_data_dict['response']['type'] == 'error':
                         results = False
                 # This will return a statement if program wasn't able to access user or pass
-                except:
-                    print('Could not access/send message and recipient or connect to the server.\n')
+                except Exception as error:
+                    print('Could not access/send message and recipient or connect to the server:', error)
                     results = False
             # Checks in case the hard coded function call has incorrect types passed in
             except TypeError:
                 print('\nFailed to connect to the server likely due to the following error(s): \n')
-                if type(self.dsuserver) != str:
+                if isinstance(self.dsuserver) != str:
                     print('\tThe server IP Address must be given as a string, bytes or bytearray expected, not an integer, float, None, or boolean\n')
-                if type(self.port) != int:
+                if isinstance(self.port) != int:
                     print('\tPort number must be given as an integer, not a string, float, None, or boolean\n')
-                if type(recipient) != str:
+                if isinstance(recipient) != str:
                     print('\tRecipient must be given as a string, not an integer, float, None, or boolean\n')
-                if type(message) != str:
+                if isinstance(message) != str:
                     print('\tMessage must be given as a string, not an integer, float, None, or boolean.\n')
 
                 results = False
@@ -197,8 +253,15 @@ class DirectMessenger:
 
         return results
 
-
     def retrieve_new(self) -> list:
+        """
+        Retrieve new retrieves only the new
+        messages a specific profile may have
+        recieved. If retrieving dm's failes, it
+        will return false, otherwise, as requested
+        from the assignment, it will return a list
+        of objects from the DirectMessage class
+        """
         # must return a list of DirectMessage objects containing all new messages
         result = self.retrieve_dms("new")
 
@@ -206,8 +269,15 @@ class DirectMessenger:
 
         return result
 
-
     def retrieve_all(self) -> list:
+        """
+        Retrieve all retrieves all the
+        messages a specific profile may have
+        recieved. If retrieving dm's failes, it
+        will return false, otherwise, as requested
+        from the assignment, it will return a list
+        of objects from the DirectMessage class
+        """
         # must return a list of DirectMessage objects containing all messages
         result = self.retrieve_dms("all")
 

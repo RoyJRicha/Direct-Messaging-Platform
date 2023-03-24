@@ -1,3 +1,8 @@
+"""
+Responsible for the storing and
+saving of .dsu profiles
+"""
+
 # Profile.py
 #
 # ICS 32
@@ -43,9 +48,9 @@ class Post(dict):
 
     """
     def __init__(self, entry: str = None, timestamp: float = 0):
-        '''
+        """
         variable instantiation
-        '''
+        """
         self._timestamp = timestamp
         self.set_entry(entry)
 
@@ -54,9 +59,9 @@ class Post(dict):
         dict.__init__(self, entry=self._entry, timestamp=self._timestamp)
 
     def set_entry(self, entry):
-        '''
+        """
         Sets the entry
-        '''
+        """
         self._entry = entry
         dict.__setitem__(self, 'entry', entry)
 
@@ -65,31 +70,24 @@ class Post(dict):
             self._timestamp = time.time()
 
     def get_entry(self):
-        '''
+        """
         gets the entry
-        '''
+        """
         return self._entry
 
     def set_time(self, time: float):
-        '''
+        """
         sets the time
-        '''
+        """
         self._timestamp = time
         dict.__setitem__(self, 'timestamp', time)
 
     def get_time(self):
-        '''
+        """
         gets the time
-        '''
+        """
         return self._timestamp
 
-    """
-
-    The property method is used to support get and set capability for entry and
-    time values. When value for entry is changed, or set, timestamp field is
-    updated to the current time.
-
-    """
     entry = property(get_entry, set_entry)
     timestamp = property(get_time, set_time)
 
@@ -103,9 +101,9 @@ class Message(dict):
     """
 
     def __init__(self, message: str = None, author: str = None, timestamp: float = 0):
-        '''
+        """
         Variable instantiation
-        '''
+        """
         self._timestamp = timestamp
         self.add_message(message)
         self.add_author(author)
@@ -114,21 +112,20 @@ class Message(dict):
         # Don't worry about this!
         dict.__init__(self, message=self._message, author=self._author, timestamp=self._timestamp)
 
-
     def add_message(self, message):
-        '''
+        """
         Sets the message
-        '''
+        """
         self._message = message
         dict.__setitem__(self, 'message', message)
 
-
     def add_author(self, author):
-        '''
+        """
         Sets the message
-        '''
+        """
         self._author = author
         dict.__setitem__(self, 'author', author)
+
 
 class Sent(dict):
     """
@@ -139,30 +136,28 @@ class Sent(dict):
     """
 
     def __init__(self, message: str = None, recipient: str = None, timestamp: float = 0):
-        '''
+        """
         Variable instantiation
-        '''
-        self._timestamp = timestamp
+        """
+        self._time = timestamp
         self.add_message(message)
         self.add_recipient(recipient)
 
         # Subclass dict to expose Post properties for serialization
         # Don't worry about this!
-        dict.__init__(self, message=self._message, recipient=self._recipient, timestamp=self._timestamp)
-
+        dict.__init__(self, message=self._message, recipient=self._recipient, timestamp=self._time)
 
     def add_message(self, message):
-        '''
+        """
         Sets the message
-        '''
+        """
         self._message = message
         dict.__setitem__(self, 'message', message)
 
-
     def add_recipient(self, recipient):
-        '''
+        """
         Sets the message
-        '''
+        """
         self._recipient = recipient
         dict.__setitem__(self, 'recipient', recipient)
 
@@ -182,10 +177,10 @@ class Profile:
     """
 
     def __init__(self, dsuserver=None, username=None, password=None):
-        '''
-        Is responsible for variable 
+        """
+        Is responsible for variable
         instantiation
-        '''
+        """
         self.dsuserver = dsuserver  # REQUIRED
         self.username = username  # REQUIRED
         self.password = password  # REQUIRED
@@ -194,7 +189,6 @@ class Profile:
         self._messages = []
         self.friends = []
         self._sent_messages = []
-
 
     def add_post(self, post: Post) -> None:
         """
@@ -208,14 +202,12 @@ class Profile:
         """
         self._posts.append(post)
 
-
     def add_message(self, message):
         """
         Adds messages recieved from
         users
         """
         self._messages.append(message)
-
 
     def add_sent_messages(self, message):
         """
@@ -235,14 +227,12 @@ class Profile:
         """
         return self._messages
 
-    
     def get_friends(self):
         """
         Returns a list of friends
         """
         return self.friends
 
-    
     def add_author(self, friend):
         """
         Adds authors from messages
@@ -251,7 +241,6 @@ class Profile:
             self.friends.append(friend)
         else:
             pass
-
 
     def del_post(self, index: int) -> bool:
         """
@@ -269,7 +258,6 @@ class Profile:
         except IndexError:
             return False
 
-
     def get_posts(self) -> list[Post]:
         """
 
@@ -278,7 +266,6 @@ class Profile:
 
         """
         return self._posts
-
 
     def save_profile(self, path: str) -> None:
         """
@@ -294,18 +281,17 @@ class Profile:
         Raises DsuFileError
 
         """
-        p = Path(path)
+        path_of = Path(path)
 
-        if p.exists() and p.suffix == '.dsu':
+        if path_of.exists() and path_of.suffix == '.dsu':
             try:
-                f = open(p, 'w')
-                json.dump(self.__dict__, f)
-                f.close()
+                file_of = open(path_of, 'w')
+                json.dump(self.__dict__, file_of)
+                file_of.close()
             except Exception as ex:
                 raise DsuFileError("Error while attempting to process the DSU file.", ex)
         else:
             raise DsuFileError("Invalid DSU file path or type")
-
 
     def load_profile(self, path: str) -> None:
         """
@@ -321,12 +307,12 @@ class Profile:
         Raises DsuProfileError, DsuFileError
 
         """
-        p = Path(path)
+        path_of = Path(path)
 
-        if p.exists() and p.suffix == '.dsu':
+        if path_of.exists() and path_of.suffix == '.dsu':
             try:
-                f = open(p, 'r')
-                obj = json.load(f)
+                file_of = open(path_of, 'r')
+                obj = json.load(file_of)
                 self.username = obj['username']
                 self.password = obj['password']
                 self.dsuserver = obj['dsuserver']
@@ -342,7 +328,7 @@ class Profile:
                 for msg_obj in obj['_sent_messages']:
                     msg = Sent(msg_obj['message'], msg_obj['recipient'], msg_obj['timestamp'])
                     self._sent_messages.append(msg)
-                f.close()
+                file_of.close()
             except Exception as ex:
                 raise DsuProfileError(ex)
         else:
