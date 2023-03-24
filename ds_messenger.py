@@ -265,7 +265,7 @@ class DirectMessenger:
         # must return a list of DirectMessage objects containing all new messages
         result = self.retrieve_dms("new")
 
-        print(result)
+        print('NEW', result, '\n')
 
         return result
 
@@ -281,6 +281,6 @@ class DirectMessenger:
         # must return a list of DirectMessage objects containing all messages
         result = self.retrieve_dms("all")
 
-        print(result)
+        print('RESULT', result, '\n')
 
         return result

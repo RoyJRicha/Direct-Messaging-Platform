@@ -4,7 +4,7 @@ import time
 
 
 message = "hiiihihihih"
-dming = dm.DirectMessenger("168.235.86.101", "guitester", "guipassword")
+dming = dm.DirectMessenger("168.235.86.101", "Friend2", "friend")
 '''
 data = dming.send(message, "Sender")
 timestamp = time.time()
