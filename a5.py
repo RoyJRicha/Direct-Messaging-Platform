@@ -882,7 +882,7 @@ class MainApp(tk.Frame):
         self.profile_window.destroy()
 
 
-if __name__ == "__main__":
+def main():
     # All Tkinter programs start with a root window. We will name ours 'main'.
     main = tk.Tk()
 
@@ -917,3 +917,6 @@ if __name__ == "__main__":
     # And finally, start up the event loop for the program (you can find
     # more on this in lectures of week 9 and 10).
     main.mainloop()
+
+if __name__ == "__main__":
+    main()
