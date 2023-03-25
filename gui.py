@@ -19,7 +19,6 @@ import socket
 # import subprocess
 from tkinter import ttk, filedialog, messagebox
 # from typing import Text
-from ttkthemes import ThemedTk
 import Profile as Profile
 import ds_messenger as dm
 
@@ -51,7 +50,6 @@ class Body(tk.Frame):
         left side in the gui
         """
         try:
-            # print(self.posts_tree.selection())
             index = int(self.posts_tree.selection()[0])
             self.selection = index
         except IndexError:
@@ -333,18 +331,18 @@ class MainApp(tk.Frame):
         a new contact sends a message to the
         user
         """
-        self.body.reset_tree()
-        if self.new_file_path:
-            if self.result is True:
-                self.check_new()
-            profile = Profile.Profile()
-            profile.load_profile(self.new_file_path)
-            # print(profile._messages)
-            # friends_lst = Profile.Profile.get_friends(self.profile)
-            # print(friends_lst)
-            contacts = profile.friends
-            for contact in contacts:
-                self.body.insert_contact(contact)
+        try:
+            self.body.reset_tree()
+            if self.new_file_path:
+                if self.result is True:
+                    self.check_new()
+                profile = Profile.Profile()
+                profile.load_profile(self.new_file_path)
+                contacts = profile.friends
+                for contact in contacts:
+                    self.body.insert_contact(contact)
+        except Profile.DsuFileError:
+            pass
 
         # SUPPOSED TO BE ABLE REFRESH THE CONTACTS LIST, NOT WORKING FIX
         if self.contact_timer_number is not None:
@@ -381,40 +379,43 @@ class MainApp(tk.Frame):
             self.result = True
         except OSError:
             pass
-
-        self.body.entry_editor.config(state='normal')
-        cur_pos = self.body.entry_editor.yview()[0]
-        self.body.entry_editor.delete('1.0', tk.END)
-        if self.new_file_path:
-            if self.result is True:
-                self.check_new()
-            profile = Profile.Profile()
-            profile.load_profile(self.new_file_path)
-            messages = profile._messages
-            sent_messages = profile._sent_messages
-            all_messages_lst = []
-            for entry in messages:
-                if self.recipient == entry['author']:
-                    all_messages_lst.append(entry)
-            for sent in sent_messages:
-                if self.recipient == sent['recipient']:
-                    all_messages_lst.append(sent)
-            sorted_message_lst = sorted(all_messages_lst, key=lambda x: float(x["timestamp"]), reverse=True)
-            for dm in sorted_message_lst:
-                if "author" in dm:
-                    time = datetime.datetime.fromtimestamp(float(dm['timestamp'])).strftime("%d/%m/%Y %I:%M %p")
-                    self.body.insert_contact_message(dm['message'], time)
-                elif "recipient" in dm:
-                    time = datetime.datetime.fromtimestamp(float(dm['timestamp'])).strftime("%d/%m/%Y %I:%M %p")
-                    self.body.insert_user_message(dm['message'], time)
-        self.body.entry_editor.config(state='disabled')
+        
+        try:
+            self.body.entry_editor.config(state='normal')
+            cur_pos = self.body.entry_editor.yview()[0]
+            self.body.entry_editor.delete('1.0', tk.END)
+            if self.new_file_path:
+                if self.result is True:
+                    self.check_new()
+                profile = Profile.Profile()
+                profile.load_profile(self.new_file_path)
+                messages = profile._messages
+                sent_messages = profile._sent_messages
+                all_messages_lst = []
+                for entry in messages:
+                    if self.recipient == entry['author']:
+                        all_messages_lst.append(entry)
+                for sent in sent_messages:
+                    if self.recipient == sent['recipient']:
+                        all_messages_lst.append(sent)
+                sorted_message_lst = sorted(all_messages_lst, key=lambda x: float(x["timestamp"]), reverse=True)
+                for dm in sorted_message_lst:
+                    if "author" in dm:
+                        time = datetime.datetime.fromtimestamp(float(dm['timestamp'])).strftime("%d/%m/%Y %I:%M %p")
+                        self.body.insert_contact_message(dm['message'], time)
+                    elif "recipient" in dm:
+                        time = datetime.datetime.fromtimestamp(float(dm['timestamp'])).strftime("%d/%m/%Y %I:%M %p")
+                        self.body.insert_user_message(dm['message'], time)
+            self.body.entry_editor.config(state='disabled')
+        except Profile.DsuFileError:
+            pass
         # cancel the previous after call, if it exists
         if self.message_timer_number is not None:
             self.root.after_cancel(self.message_timer_number)
         # make a new after call
         self.body.entry_editor.yview(tk.MOVETO, cur_pos)
 
-        self.message_timer_number = self.root.after(250, self.list_contact_messages)
+        self.message_timer_number = self.root.after(1000, self.list_contact_messages)
 
     def send_message(self):
         """
@@ -424,7 +425,6 @@ class MainApp(tk.Frame):
         that sent message into the users profile
         """
         text = self.body.get_text_entry()
-        print('Message', text)
         self.body.set_text_entry()
         if (text != "") and (text.isspace() is False):
             profile = Profile.Profile()
@@ -443,7 +443,8 @@ class MainApp(tk.Frame):
                 profile.add_sent_messages(store_new_message)
                 profile.save_profile(self.new_file_path)
             else:
-                messagebox.showerror("Error", "       Connection Error:\n\nCannot Send Messages")
+                messagebox.showerror("Error",
+                                     "Cannot Send Messages:\n\tEnsure No New Lines\n\tCheck Connection\n\tCheck IP Address")
 
     def add_contact(self):
         """
@@ -488,8 +489,6 @@ class MainApp(tk.Frame):
         to the users profile
         """
         new_contact = self.new_contact_entry.get()
-        print('TYPE', new_contact)
-
         profile = Profile.Profile()
         profile.load_profile(self.new_file_path)
         profile.save_profile(self.new_file_path)
@@ -515,7 +514,6 @@ class MainApp(tk.Frame):
         self.body.entry_editor.config(state='normal')
         self.body.entry_editor.delete('1.0', tk.END)
         self.recipient = recipient
-        print(self.recipient)
         self.list_contact_messages()
         self.body.entry_editor.config(state='disabled')
 
@@ -594,11 +592,6 @@ class MainApp(tk.Frame):
         else:
             messagebox.showerror("Error", "Load File Before Configuring")
 
-    '''
-    def enable_password_entry(self, event):
-        self.pass_entry.configure(state="normal")
-    '''
-
     def username_entry_change(self, event):
         """
         Responsible for recognnising whether the
@@ -625,28 +618,21 @@ class MainApp(tk.Frame):
         error = False
         error_code = ""
 
-        print('IP Address:', edited_ip)
-        print('Username:', edited_username)
-        print('Password', edited_password)
-
         edited_profile = Profile.Profile()
         edited_profile.load_profile(self.new_file_path)
         edited_profile.save_profile(self.new_file_path)
         if (edited_ip.isspace() is False) and (edited_ip != "") and (" " not in edited_ip):
-            print('Saved IP Address:', edited_ip)
             edited_profile.dsuserver = edited_ip
             self.result = True
         elif (edited_ip.isspace() is True) or (" " in edited_ip):
             error = True
             error_code += "IP Address Includes Spaces\n"
         if (edited_username.isspace() is False) and (edited_username != "") and (" " not in edited_username):
-            print('Saved Username:', edited_username)
             edited_profile.username = edited_username
         elif (edited_username.isspace() is True) or (" " in edited_username):
             error = True
             error_code += "Username Includes Spaces\n"
         if (edited_password.isspace() is False) and (edited_password != "") and (" " not in edited_password):
-            print('Saved Password', edited_password)
             edited_profile.password = edited_password
         elif (edited_password.isspace() is True) or (" " in edited_password):
             error = True
@@ -665,14 +651,6 @@ class MainApp(tk.Frame):
         """
         self.edit_window.destroy()
 
-    def publish(self, message: str):
-        """
-        Not sure what this is for
-        for a5, will most likely delete
-        """
-        # You must implement this!
-        pass
-
     def check_new(self):
         """
         This is a huge part of the program
@@ -680,24 +658,27 @@ class MainApp(tk.Frame):
         new messages or recipients that
         contact the user
         """
-        self.result = True
-        if self.new_file_path:
-            check_profile = Profile.Profile()
-            check_profile.load_profile(self.new_file_path)
-            dming = dm.DirectMessenger(check_profile.dsuserver, check_profile.username, check_profile.password)
-            data = dming.retrieve_new()
-            if data is not False:
-                self.result = True
-                check_profile.save_profile(self.new_file_path)
-                for entry in data:
-                    new_message = Profile.Message(entry.message, entry.recipient, entry.timestamp)
-                    check_profile.add_author(entry.recipient)
-                    check_profile.add_message(new_message)
-                check_profile.save_profile(self.new_file_path)
-            elif data is False:
-                self.result = False
-                # Fix later to give a more precise error, like ip address or connection, and more
-                messagebox.showerror("Error", "       Connection Error:\n\nCannot Load New messages")
+        try:
+            self.result = True
+            if self.new_file_path:
+                check_profile = Profile.Profile()
+                check_profile.load_profile(self.new_file_path)
+                dming = dm.DirectMessenger(check_profile.dsuserver, check_profile.username, check_profile.password)
+                data = dming.retrieve_new()
+                if data is not False:
+                    self.result = True
+                    check_profile.save_profile(self.new_file_path)
+                    for entry in data:
+                        new_message = Profile.Message(entry.message, entry.recipient, entry.timestamp)
+                        check_profile.add_author(entry.recipient)
+                        check_profile.add_message(new_message)
+                    check_profile.save_profile(self.new_file_path)
+                elif data is False:
+                    self.result = False
+                    # Fix later to give a more precise error, like ip address or connection, and more
+                    messagebox.showerror("Error", "Cannot Load New Messages:\n\n\tCheck IP Address\n\tCheck Connection\n\tCheck for Invalid User/Pass")
+        except Profile.DsuFileError:
+            pass
 
     def _draw(self):
         """
@@ -732,6 +713,12 @@ class MainApp(tk.Frame):
         self.footer = Footer(self.root, send_callback=self.send_message)
         self.footer.pack(fill=tk.BOTH, side=tk.BOTTOM)
 
+    '''
+    def footer_user(self):
+        self.footer_label_two = tk.Label(master=self, text=f"Ready.")
+        self.footer_label_two.pack(fill=tk.BOTH, side=tk.LEFT, padx=5)
+    '''
+    
     def close_gui(self):
         """
         Responsible for closing
@@ -752,7 +739,7 @@ class MainApp(tk.Frame):
         if self.recipient_timer_number is not None:
             self.root.after_cancel(self.recipient_timer_number)
         # make a new after call
-        self.recipient_timer_number = self.root.after(250, self.check_recipient_selected)
+        self.recipient_timer_number = self.root.after(1000, self.check_recipient_selected)
 
     def open_file(self):
         """
@@ -768,6 +755,9 @@ class MainApp(tk.Frame):
             except Profile.DsuFileError:
                 self.new_file_path = None
                 messagebox.showerror("Error", "Not a .dsu File")
+            except Profile.DsuProfileError:
+                self.new_file_path = None
+                messagebox.showerror("Error", "File not in proper Profile Format")
 
             if (self.new_file_path):
                 self.recipient = None
@@ -784,16 +774,12 @@ class MainApp(tk.Frame):
         if file_path:
             # Saves the file path as a variable for Profile.py to use
             self.new_file_path = file_path
-            print(self.new_file_path)
-            '''
-            # Open the new file in the default text editor
-            if self.my_os == 'Windows':
-                os.startfile(file_path)
-            else:
-                subprocess.call(('open', file_path))
-            '''
             # Calls the function to open a new window to save profile info
             self.biometrics_window()
+
+            if (self.new_file_path):
+                self.recipient = None
+                self.check_recipient_selected()
 
     def biometrics_window(self):
         """
@@ -854,18 +840,40 @@ class MainApp(tk.Frame):
         new_password = self.new_password_entry.get()
         new_bio = self.new_bio_entry.get()
         new_ip_address = self.new_ip_entry.get()
+        error = False
+        error_code = ""
 
         profile = Profile.Profile()
         profile.save_profile(self.new_file_path)
-        profile.username = new_username
-        profile.password = new_password
-        profile.bio = new_bio
-        profile.dsuserver = new_ip_address
-        profile.save_profile(self.new_file_path)
 
-        # Close the user info window
-        self.profile_window.destroy()
-        self.list_contacts()
+        if (new_ip_address.isspace() is False) and (new_ip_address != "") and (" " not in new_ip_address):
+            profile.dsuserver = new_ip_address
+            self.result = True
+        elif (new_ip_address.isspace() is True) or (" " in new_ip_address):
+            error = True
+            error_code += "IP Address Includes Spaces\n"
+        if (new_username.isspace() is False) and (new_username != "") and (" " not in new_username):
+            profile.username = new_username
+        elif (new_username.isspace() is True) or (" " in new_username):
+            error = True
+            error_code += "Username Includes Spaces\n"
+        if (new_password.isspace() is False) and (new_password != "") and (" " not in new_password):
+            profile.password = new_password
+        elif (new_password.isspace() is True) or (" " in new_password):
+            error = True
+            error_code += "Password Includes Spaces\n"
+
+        profile.bio = new_bio
+
+        if error is True:
+            messagebox.showerror("Error", error_code)
+        else:
+            profile.save_profile(self.new_file_path)
+            # Create the new file
+            open(self.new_file_path, 'a').close()
+            # Close user info window and list contacts
+            self.profile_window.destroy()
+            self.list_contacts()
 
     def cancel_window(self):
         """Responsible for closing the
@@ -876,7 +884,7 @@ class MainApp(tk.Frame):
 
 if __name__ == "__main__":
     # All Tkinter programs start with a root window. We will name ours 'main'.
-    main = ThemedTk(theme="adapta")
+    main = tk.Tk()
 
     # 'title' assigns a text value to the Title Bar area of a window.
     main.title("The Ultimate Messaging App (Better than Discord)")

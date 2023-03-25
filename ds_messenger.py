@@ -79,14 +79,11 @@ class DirectMessenger:
                 c_socket.sendall(data.encode())
                 received_data = c_socket.recv(4096).decode()
                 received_data_dict = json.loads(received_data)
-                print()
-                print(received_data_dict['response']['message'])
-                print()
                 if received_data_dict['response']['type'] == 'error':
                     results = False
             # This will return a statement if program wasn't able to access user or pass
-            except:
-                print('Could not access/send username and password or connect to the server.\n')
+            except Exception as error:
+                print('Could not access/send username and password or connect to the server:', error)
                 results = False
         # Checks for a failed connection
         except ConnectionRefusedError:
@@ -99,13 +96,13 @@ class DirectMessenger:
         # Checks in case the hard coded function call has incorrect types passed in
         except TypeError:
             print('\nFailed to connect to the server likely due to the following error(s): \n')
-            if isinstance(self.dsuserver) != str:
+            if type(self.dsuserver) != str:
                 print('\tThe server IP Address must be given as a string, bytes or bytearray expected, not an integer, float, None, or boolean\n')
-            if isinstance(self.port) != int:
+            if type(self.port) != int:
                 print('\tPort number must be given as an integer, not a string, float, None, or boolean\n')
-            if isinstance(self.username) != str:
+            if type(self.username) != str:
                 print('\tUsername must be given as a string, not an integer, float, None, or boolean\n')
-            if isinstance(self.password) != str:
+            if type(self.password) != str:
                 print('\tPassword must be given as a string, not an integer, float, None, or boolean\n')
 
             results = False
@@ -135,10 +132,10 @@ class DirectMessenger:
             # This will print an the error from the server if an error occurs
             except KeyError:
                 print(received_data_dict['response']['message'])
-                print()
                 results = False
             except Exception as error:
                 print('Error has occured:', error)
+                results = False
         else:
             pass
 
@@ -174,16 +171,12 @@ class DirectMessenger:
                     received_data = c_socket.recv(4096).decode()
                     # print("Received data:", received_data)
                     received_data_dict = json.loads(received_data)
-                    print()
-                    print(received_data_dict['response']['messages'])
                     dms_dict = received_data_dict['response']['messages']
                     new_dms = []
-                    print()
                     if received_data_dict['response']['type'] == 'error':
                         results = False
                 # This will return a statement if program wasn't able to access user or pass
                 except Exception as error:
-                    traceback.print_exc()
                     print('Could not access/send message and recipient or connect to the server:', error)
                     results = False
 
@@ -216,7 +209,6 @@ class DirectMessenger:
         """
         # must return true if message successfully sent, false if send failed.
         results, c_socket = self.retrieve_token()
-        print(recipient)
         # Accessing the username and password
         if results is True:
             try:
@@ -226,9 +218,6 @@ class DirectMessenger:
                     c_socket.sendall(data.encode())
                     received_data = c_socket.recv(4096).decode()
                     received_data_dict = json.loads(received_data)
-                    print()
-                    print(received_data_dict['response']['message'])
-                    print()
                     if received_data_dict['response']['type'] == 'error':
                         results = False
                 # This will return a statement if program wasn't able to access user or pass
@@ -238,15 +227,18 @@ class DirectMessenger:
             # Checks in case the hard coded function call has incorrect types passed in
             except TypeError:
                 print('\nFailed to connect to the server likely due to the following error(s): \n')
-                if isinstance(self.dsuserver) != str:
+                if type(self.dsuserver) != str:
                     print('\tThe server IP Address must be given as a string, bytes or bytearray expected, not an integer, float, None, or boolean\n')
-                if isinstance(self.port) != int:
+                if type(self.port) != int:
                     print('\tPort number must be given as an integer, not a string, float, None, or boolean\n')
-                if isinstance(recipient) != str:
+                if type(recipient) != str:
                     print('\tRecipient must be given as a string, not an integer, float, None, or boolean\n')
-                if isinstance(message) != str:
+                if type(message) != str:
                     print('\tMessage must be given as a string, not an integer, float, None, or boolean.\n')
 
+                results = False
+            except Exception as error:
+                print('Error Sending Message:', error)
                 results = False
 
         c_socket.close()
@@ -265,8 +257,6 @@ class DirectMessenger:
         # must return a list of DirectMessage objects containing all new messages
         result = self.retrieve_dms("new")
 
-        print('NEW', result, '\n')
-
         return result
 
     def retrieve_all(self) -> list:
@@ -280,7 +270,5 @@ class DirectMessenger:
         """
         # must return a list of DirectMessage objects containing all messages
         result = self.retrieve_dms("all")
-
-        print('RESULT', result, '\n')
 
         return result
