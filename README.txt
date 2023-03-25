@@ -60,3 +60,17 @@ This code now supports many key words such as @weather, @weather_temp, @weather_
 these key words in their post, assuming all data is entered properly from the user and received properly from the API, the key words will be replaced
 with their respective values. There are many error cecks as well as custom error checks in the WebAPI module to ensure no server errors occur during
 the process.
+
+
+NEW ADDITIONS FOR ASSIGNMENT 5:
+Added the ability to direct message with students across servers using a gui and valid profiles. The gui is very intuative and allows for easy access
+to new and old files as well as new and old contacts with or without internet grabbing old messages only without internet and all new and old messages
+with internet. It also provides a lot of error checking that ensures the code does not break under special circumstances.
+
+
+THANK YOU FOR AN AMAZING YEAR AND THESE AMAZING AND INTUATIVE ASSIGNMENTS. I HAD A LOT OF FUN WORKING THROUGH THEM AND FIGURING OUT HOW TO GET PAST ERRORS
+WHEN I GOT STUCK ON THEM.
+
+LOOKING FORWARD TO ICS 33.
+
+ZOT ZOT ZOT !!!
