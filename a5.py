@@ -6,10 +6,6 @@ features that are intuative
 and easy for the user to use.
 """
 
-# Roy Richa
-# rricha@uci.edu
-# 51514923
-
 import tkinter as tk
 # import os
 import time

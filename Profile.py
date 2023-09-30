@@ -3,19 +3,6 @@ Responsible for the storing and
 saving of .dsu profiles
 """
 
-# Profile.py
-#
-# ICS 32
-# Assignment #2: Journal
-#
-# Author: Mark S. Baldwin, modified by Alberto Krone-Martins
-#
-# v0.1.9
-
-# Roy Richa
-# rricha@uci.edu
-# 51514923
-
 import json
 import time
 from pathlib import Path

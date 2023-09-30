@@ -2,9 +2,6 @@
 Responsible for the protocole
 of the dsu client module
 '''
-# Roy Richa
-# rricha@uci.edu
-# 51514923
 
 import json
 import time
