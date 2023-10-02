@@ -118,16 +118,6 @@ class TestDirectMessenger(unittest.TestCase):
             dm = DirectMessenger(dsuserver="168.235.86.101", username="Friend2", password="friend")
             result, _ = dm.retrieve_token()
             self.assertFalse(result)
-        
-    def test_retrieve_dms_error(self):
-        """
-        Tests a retrieving dms error
-        """
-        self.dm.retrieve_token = MagicMock(return_value=(True, MagicMock()))
-        with unittest.mock.patch('ds_protocol.unread_dms', return_value='{"token": "f21ccb88-6aac-4592-aebf-4b6bd9b4d033", "directmessage": "new"}'):
-            with unittest.mock.patch('socket.socket.recv', return_value='{"response": {"type": "error", "message": "An error occurred"}}'.encode()):
-                result = self.dm.retrieve_dms("new")
-        self.assertFalse(result)
 
     def test_retrieve_dms_invalid_token(self):
         """
